@@ -1,0 +1,366 @@
+﻿.container {
+    width: 95%;
+}
+/* Section Headers */
+.section {
+    margin-bottom: 3rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.section-icon {
+    width: 20px;
+    height: 20px;
+    color: #64748b;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.section-description {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-left: 2.75rem;
+    margin-bottom: 1.5rem;
+    padding: 0 1.5rem;
+}
+/* Interview Cards */
+.interview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.interview-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2%;
+    margin: 2%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+    .interview-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+
+/* Interview Icons */
+.interview-type-icon {
+    width: 40px;
+    height: 40px;
+    background: #eff6ff;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+    .interview-type-icon svg {
+        width: 20px;
+        height: 20px;
+        color: #3b82f6;
+    }
+
+    .interview-type-icon.phone {
+        background: #f0fdf4;
+    }
+
+        .interview-type-icon.phone svg {
+            color: #22c55e;
+        }
+
+/* Interview Content */
+.interview-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.interview-info {
+    flex: 1;
+}
+
+.interview-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.interview-company {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.interview-details {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.interview-interviewer {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+/* Interview Actions */
+.interview-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: lowercase;
+}
+
+.status-Confirmed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-Pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-Active {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-Completed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 0.375rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+    .action-btn:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    .action-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .action-btn.cancel {
+        background: #dc2626;
+        color: white;
+        border-color: #dc2626;
+    }
+
+        .action-btn.cancel:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+    .modal-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+.modal-container {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.show .modal-container {
+    transform: scale(1);
+}
+
+.modal-container-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-container-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.modal-container-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s ease;
+}
+
+    .modal-container-close:hover {
+        background: #f1f5f9;
+    }
+
+.modal-container-content {
+    margin-bottom: 2rem;
+}
+
+.modal-container-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+}
+
+    .btn-danger:hover {
+        background: #b91c1c;
+    }
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #1e293b;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    z-index: 10000;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    max-width: 400px;
+}
+
+    .toast.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .toast.success {
+        background: #22c55e;
+    }
+
+    .toast.error {
+        background: #dc2626;
+    }
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.page-btn {
+    padding: 0.4rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .page-btn:hover {
+        background: #f3f4f6;
+    }
+
+    .page-btn.active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }

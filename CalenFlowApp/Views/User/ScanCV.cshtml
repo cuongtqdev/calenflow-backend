@@ -1,0 +1,522 @@
+﻿ @{
+	Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Analyzer - Phân Tích CV Thông Minh</title>
+    <link rel="stylesheet" href="~/css/UserScanCV.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 CV Analyzer</h1>
+            <p>Phân tích CV thông minh với AI - Tìm ra điểm mạnh và cải thiện CV của bạn</p>
+            <div class="back-button-container">
+                <button class="back-btn" id="backBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15,18 9,12 15,6" />
+                    </svg>
+                    <span>Trở về</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section" id="uploadSection">
+                <h2 class="section-title">
+                    📄 Upload CV của bạn
+                </h2>
+
+                <div class="upload-area" id="uploadArea">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7,10 12,15 17,10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <div class="upload-text">Kéo thả CV vào đây hoặc click để chọn file</div>
+                    <div class="upload-subtext">Hỗ trợ: PDF, JPG, PNG (Tối đa 10MB)</div>
+                    <input type="file" class="file-input" id="fileInput" accept=".pdf,.jpg,.jpeg,.png">
+                </div>
+
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="cv-preview" id="cvPreview">
+                    <div class="cv-info">
+                        <div class="cv-thumbnail">CV</div>
+                        <div class="cv-details">
+                            <h4 id="fileName">CV_Document.pdf</h4>
+                            <p id="fileSize">2.3 MB</p>
+                        </div>
+                    </div>
+                    <button class="analyze-btn" id="analyzeBtn">
+                        <span class="text">🔍 Phân Tích CV</span>
+                        <span class="loading">⏳</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-section" id="chatSection">
+                <div class="chat-header">
+                    <h3>
+                        🤖 AI Assistant
+                    </h3>
+                    <div class="bot-status" id="botStatus">Sẵn sàng phân tích CV của bạn</div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                        </svg>
+                        <h3>Chào mừng bạn!</h3>
+                        <p>Upload CV của bạn để tôi có thể phân tích và đưa ra những gợi ý cải thiện tốt nhất.</p>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="bot-avatar">🤖</div>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="quick-actions" id="quickActions" style="display: none;">
+                        <div class="quick-action" data-message="Phân tích thêm về kỹ năng">💼 Phân tích kỹ năng</div>
+                        <div class="quick-action" data-message="Gợi ý cải thiện layout">🎨 Cải thiện layout</div>
+                        <div class="quick-action" data-message="Kiểm tra grammar và spelling">✏️ Kiểm tra ngữ pháp</div>
+                        <div class="quick-action" data-message="So sánh với CV mẫu">📊 So sánh CV mẫu</div>
+                    </div>
+                    <div class="chat-input-wrapper">
+                        <textarea class="chat-input"
+                                  id="chatInput"
+                                  placeholder="Hỏi tôi về CV của bạn..."
+                                  rows="1"
+                                  disabled></textarea>
+                        <button class="send-btn" id="sendBtn" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13" />
+                                <polygon points="22,2 15,22 11,13 2,9 22,2" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class CVAnalyzer {
+            constructor() {
+                this.uploadArea = document.getElementById('uploadArea');
+                this.fileInput = document.getElementById('fileInput');
+                this.cvPreview = document.getElementById('cvPreview');
+                this.analyzeBtn = document.getElementById('analyzeBtn');
+                this.chatSection = document.getElementById('chatSection');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                this.botStatus = document.getElementById('botStatus');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressFill = document.getElementById('progressFill');
+                this.uploadSection = document.getElementById('uploadSection');
+                this.chatInput = document.getElementById('chatInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.quickActions = document.getElementById('quickActions');
+                this.backBtn = document.getElementById('backBtn');
+
+                this.currentFile = null;
+                this.isAnalyzing = false;
+                this.isAnalyzed = false;
+                this.isChatting = false;
+
+                this.initEventListeners();
+                this.initChatResponses();
+            }
+
+            initEventListeners() {
+                this.uploadArea.addEventListener('click', () => {
+                    this.fileInput.click();
+                });
+
+                this.uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    this.uploadArea.classList.add('dragover');
+                });
+
+                this.uploadArea.addEventListener('dragleave', () => {
+                    this.uploadArea.classList.remove('dragover');
+                });
+
+                this.uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    this.uploadArea.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        this.handleFileSelect(files[0]);
+                    }
+                });
+
+                this.fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        this.handleFileSelect(e.target.files[0]);
+                    }
+                });
+
+                this.analyzeBtn.addEventListener('click', () => {
+                    if (!this.isAnalyzing && this.currentFile) {
+                        this.startAnalysis();
+                    }
+                });
+
+                this.chatInput.addEventListener('input', () => {
+                    this.autoResizeTextarea();
+                    this.updateSendButton();
+                });
+
+                this.chatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+
+                this.sendBtn.addEventListener('click', () => {
+                    this.sendMessage();
+                });
+
+                this.quickActions.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('quick-action')) {
+                        const message = e.target.getAttribute('data-message');
+                        this.chatInput.value = message;
+                        this.updateSendButton();
+                        this.sendMessage();
+                    }
+                });
+
+                this.backBtn.addEventListener('click', () => {
+                    this.handleBackNavigation();
+                });
+            }
+
+            initChatResponses() {
+                this.chatResponses = {
+                    'phân tích thêm về kỹ năng': {
+                        response: "📋 **Phân tích chi tiết về kỹ năng:**\n\n✅ **Kỹ năng mạnh:**\n• <span class='highlight-positive'>Technical skills phù hợp với vị trí</span>\n• <span class='highlight-positive'>Có kinh nghiệm thực tế</span>\n\n⚠️ **Cần bổ sung:**\n• <span class='highlight-suggestion'>Thêm soft skills như leadership, teamwork</span>\n• <span class='highlight-suggestion'>Chứng chỉ chuyên môn nếu có</span>\n• <span class='highlight-suggestion'>Đánh giá mức độ thành thạo (Beginner/Intermediate/Advanced)</span>",
+                        delay: 2000
+                    },
+                    'gợi ý cải thiện layout': {
+                        response: "🎨 **Gợi ý cải thiện Layout:**\n\n1. <span class='highlight-suggestion'>Sử dụng white space hiệu quả</span> - tránh bố cục quá chật\n2. <span class='highlight-suggestion'>Hierarchy rõ ràng</span> - tiêu đề lớn hơn nội dung\n3. <span class='highlight-suggestion'>Alignment nhất quán</span> - căn lề đều đặn\n4. <span class='highlight-suggestion'>Font size phù hợp</span> - 10-12pt cho nội dung, 14-16pt cho tiêu đề\n5. <span class='highlight-suggestion'>Màu sắc chuyên nghiệp</span> - tối đa 2-3 màu\n\n💡 **Tip:** Sử dụng template có sẵn để đảm bảo layout chuyên nghiệp!",
+                        delay: 2500
+                    },
+                    'kiểm tra grammar và spelling': {
+                        response: "✏️ **Kiểm tra Grammar & Spelling:**\n\n✅ **Đã tốt:**\n• Cấu trúc câu rõ ràng\n• Sử dụng từ vựng chuyên nghiệp\n\n⚠️ **Cần chú ý:**\n• <span class='highlight-negative'>Một số lỗi chính tả nhỏ</span>\n• <span class='highlight-negative'>Thì động từ chưa nhất quán</span>\n• <span class='highlight-suggestion'>Nên dùng action verbs: Achieved, Implemented, Led</span>\n\n🔧 **Công cụ hỗ trợ:**\n• Grammarly cho tiếng Anh\n• Microsoft Word spell check\n• Nhờ bạn bè review lại",
+                        delay: 2200
+                    },
+                    'so sánh với cv mẫu': {
+                        response: "📊 **So sánh với CV mẫu:**\n\n**CV của bạn: 7.5/10**\n**CV mẫu tốt: 9/10**\n\n📈 **Điểm cần cải thiện:**\n• <span class='highlight-suggestion'>Thêm Professional Summary</span> (CV mẫu có)\n• <span class='highlight-suggestion'>Quantify achievements</span> (CV mẫu: 'Tăng 25% hiệu suất')\n• <span class='highlight-suggestion'>Skills section chi tiết hơn</span>\n• <span class='highlight-suggestion'>Format nhất quán</span>\n\n🎯 **Điểm mạnh của bạn:**\n• <span class='highlight-positive'>Kinh nghiệm phong phú</span>\n• <span class='highlight-positive'>Layout sạch sẽ</span>",
+                        delay: 2800
+                    }
+                };
+
+                this.defaultResponses = [
+                    "Tôi hiểu bạn muốn biết thêm về CV. Bạn có thể hỏi cụ thể về kỹ năng, kinh nghiệm, hoặc format của CV nhé!",
+                    "Đó là câu hỏi hay! Dựa trên CV đã phân tích, tôi nghĩ bạn nên tập trung vào việc làm nổi bật những thành tích cụ thể.",
+                    "Để tôi giúp bạn tốt hơn, bạn có thể hỏi về những phần cụ thể trong CV như: kỹ năng, kinh nghiệm, học vấn, hoặc format.",
+                    "Tôi khuyên bạn nên sử dụng các quick actions bên dưới để có câu trả lời chi tiết hơn về CV của mình!"
+                ];
+            }
+
+            handleFileSelect(file) {
+                const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+                if (!allowedTypes.includes(file.type)) {
+                    this.showError('Vui lòng chọn file PDF, JPG hoặc PNG');
+                    return;
+                }
+
+                if (file.size > 10 * 1024 * 1024) {
+                    this.showError('File quá lớn. Vui lòng chọn file nhỏ hơn 10MB');
+                    return;
+                }
+
+                this.currentFile = file;
+                this.showFilePreview(file);
+                this.simulateUpload();
+            }
+
+            showFilePreview(file) {
+                const fileName = document.getElementById('fileName');
+                const fileSize = document.getElementById('fileSize');
+
+                fileName.textContent = file.name;
+                fileSize.textContent = this.formatFileSize(file.size);
+
+                this.cvPreview.classList.add('show');
+                this.chatSection.classList.add('active');
+                this.botStatus.textContent = 'Đã nhận CV, sẵn sàng phân tích';
+            }
+
+            simulateUpload() {
+                this.progressBar.classList.add('show');
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            this.progressBar.classList.remove('show');
+                        }, 500);
+                    }
+                    this.progressFill.style.width = progress + '%';
+                }, 100);
+            }
+
+           async startAnalysis() {
+            if (this.isAnalyzing) return;
+            this.isAnalyzing = true;
+            this.analyzeBtn.classList.add('analyzing');
+            this.analyzeBtn.disabled = true;
+            this.uploadSection.classList.add('analyzing');
+            this.botStatus.textContent = 'Đang phân tích CV...';
+            this.clearChatMessages();
+            this.showTypingIndicator();
+
+            const formData = new FormData();
+            formData.append("file", this.currentFile);
+
+            try {
+                const response = await fetch("/CV/analyze", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+
+                const data = await response.json();
+                this.hideTypingIndicator();
+                this.addBotMessage(data.data);
+                this.completeAnalysis();
+            } catch (err) {
+                this.hideTypingIndicator();
+                this.addBotMessage("❌ Lỗi khi phân tích CV: " + err.message);
+                console.log("❌ Lỗi khi phân tích CV: " + err.message);
+            }
+        }
+
+            async simulateAnalysis() {
+                const analysisSteps = [
+                    {
+                        delay: 2000,
+                        message: "Tôi đã nhận được CV của bạn và đang bắt đầu quá trình phân tích..."
+                    },
+                    {
+                        delay: 3000,
+                        message: "🔍 **Phân tích cấu trúc CV:**\n\n✅ **Điểm mạnh:**\n• Layout rõ ràng, dễ đọc\n• Thông tin liên hệ đầy đủ\n• Sử dụng font chữ chuyên nghiệp\n\n⚠️ **Cần cải thiện:**\n• <span class='highlight-negative'>Thiếu summary/objective section</span>\n• <span class='highlight-negative'>Không có keywords quan trọng cho ATS</span>"
+                    },
+                    {
+                        delay: 2500,
+                        message: "📊 **Phân tích nội dung:**\n\n✅ **Điểm mạnh:**\n• <span class='highlight-positive'>Kinh nghiệm làm việc được trình bày chi tiết</span>\n• <span class='highlight-positive'>Kỹ năng technical phù hợp với vị trí</span>\n• Học vấn rõ ràng\n\n⚠️ **Cần cải thiện:**\n• <span class='highlight-negative'>Thiếu số liệu cụ thể về thành tích</span>\n• <span class='highlight-negative'>Mô tả công việc chưa highlight impact</span>"
+                    },
+                    {
+                        delay: 2000,
+                        message: "💡 **Gợi ý cải thiện:**\n\n1. <span class='highlight-suggestion'>Thêm Professional Summary</span> ở đầu CV (2-3 câu tóm tắt)\n2. <span class='highlight-suggestion'>Sử dụng action verbs</span>: 'Achieved', 'Implemented', 'Led'\n3. <span class='highlight-suggestion'>Thêm metrics</span>: '20% increase', '50+ projects'\n4. <span class='highlight-suggestion'>Tối ưu keywords</span> cho ATS systems\n5. <span class='highlight-suggestion'>Thêm section Projects</span> nếu có"
+                    },
+                    {
+                        delay: 1500,
+                        message: "🎯 **Đánh giá tổng thể:** 7.5/10\n\nCV của bạn có foundation tốt nhưng cần một số cải thiện để nổi bật hơn. Hãy áp dụng các gợi ý trên để tăng cơ hội được nhà tuyển dụng chú ý!\n\n✨ Bây giờ bạn có thể chat với tôi để hỏi thêm về bất kỳ phần nào của CV!"
+                    }
+                ];
+
+                for (let step of analysisSteps) {
+                    await this.delay(step.delay);
+                    this.hideTypingIndicator();
+                    this.addBotMessage(step.message);
+                    if (step !== analysisSteps[analysisSteps.length - 1]) {
+                        this.showTypingIndicator();
+                    }
+                }
+                this.completeAnalysis();
+            }
+
+            completeAnalysis() {
+                this.isAnalyzing = false;
+                this.isAnalyzed = true;
+                this.analyzeBtn.classList.remove('analyzing');
+                this.analyzeBtn.disabled = false;
+                this.uploadSection.classList.remove('analyzing');
+                this.botStatus.textContent = 'Phân tích hoàn tất - Sẵn sàng chat';
+                this.analyzeBtn.querySelector('.text').textContent = '🔄 Phân Tích Lại';
+                this.enableChat();
+            }
+
+            enableChat() {
+                this.chatInput.disabled = false;
+                this.chatInput.placeholder = 'Hỏi tôi về CV của bạn...';
+                this.updateSendButton();
+                this.quickActions.style.display = 'flex';
+            }
+
+            async sendMessage() {
+                const message = this.chatInput.value.trim();
+                if (!message || this.isChatting) return;
+                this.isChatting = true;
+                this.addUserMessage(message);
+                this.chatInput.value = '';
+                this.autoResizeTextarea();
+                this.updateSendButton();
+                this.showTypingIndicator();
+                await this.generateBotResponse(message);
+                this.isChatting = false;
+            }
+            addUserMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user';
+                messageDiv.style.animation = 'userMessageSlide 0.5s ease';
+                messageDiv.innerHTML = `
+                    <div class="message-content">${message}</div>
+                    <div class="user-avatar">👤</div>
+                `;
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            async generateBotResponse(userMessage) {
+                try {
+                    const messages = [];
+                    const chatNodes = this.chatMessages.querySelectorAll('.message');
+                    const recentNodes = Array.from(chatNodes).slice(-5); 
+                    let delay = 0;
+                    recentNodes.forEach(node => {
+                        const role = node.classList.contains('user') ? "user" : "bot";
+                        const text = node.querySelector('.message-content').innerText;
+                        messages.push({ role, text });
+                    });
+
+                    const payload = {
+                        context: messages,   
+                        latestMessage: userMessage 
+                    };
+
+                    const response = await fetch("/CV/AIRespond", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.addBotMessage(data.reply);
+                        this.hideTypingIndicator();
+                    } else {
+                        this.addBotMessage("❌ Lỗi: " + (data.error || "Không rõ nguyên nhân"));
+                    }
+
+                } catch (err) {
+                    console.error("Lỗi generateBotResponse:", err);
+                    this.addBotMessage("⚠️ Đã xảy ra lỗi khi gọi AI.");
+                }
+            }
+
+            addBotMessage(message) {
+				console.log("Bot message:", message);
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot';
+                messageDiv.innerHTML = `
+                    <div class="bot-avatar">🤖</div>
+                    <div class="message-content">${message.replace(/\n/g, '<br>')}</div>
+                `;
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+
+            showTypingIndicator() {
+                this.typingIndicator.classList.add('show');
+                this.scrollToBottom();
+            }
+
+            hideTypingIndicator() {
+                this.typingIndicator.classList.remove('show');
+            }
+
+            clearChatMessages() {
+                const messages = this.chatMessages.querySelectorAll('.message');
+                messages.forEach(msg => msg.remove());
+
+                const welcomeMsg = this.chatMessages.querySelector('.welcome-message');
+                if (welcomeMsg) {
+                    welcomeMsg.style.display = 'none';
+                }
+            }
+
+            autoResizeTextarea() {
+                this.chatInput.style.height = 'auto';
+                this.chatInput.style.height = Math.min(this.chatInput.scrollHeight, 120) + 'px';
+            }
+
+            updateSendButton() {
+                const hasText = this.chatInput.value.trim().length > 0;
+                const isEnabled = hasText && !this.isChatting && this.isAnalyzed;
+                this.sendBtn.disabled = !isEnabled;
+            }
+
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                }, 100);
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            showError(message) {
+                alert(message);
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            handleBackNavigation() {
+                const backUrl = '/User/Dashboard'; 
+
+                if (this.currentFile || this.isAnalyzed) {
+                    const confirmLeave = confirm('Bạn có chắc muốn rời khỏi trang này? Dữ liệu phân tích sẽ bị mất.');
+                    if (confirmLeave) {
+                        window.location.href = backUrl;
+                    }
+                } else {
+                    window.location.href = backUrl;
+                }
+            }
+        }
+
+         document.addEventListener('DOMContentLoaded', () => {
+            new CVAnalyzer();
+        });
+
+        document.addEventListener('dragover', (e) => e.preventDefault());
+        document.addEventListener('drop', (e) => e.preventDefault());
+    </script>
+</body>
+</html>
+

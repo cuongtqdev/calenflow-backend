@@ -1,0 +1,21 @@
+# Build
+bin/
+obj/
+publish/
+
+# User-specific
+*.user
+*.suo
+*.userosscache
+
+# VS
+.vs/
+.vscode/
+
+# Logs
+*.log
+
+# Secrets
+appsettings.*.local.json
+CalenFlowApp/appsettings.json
+

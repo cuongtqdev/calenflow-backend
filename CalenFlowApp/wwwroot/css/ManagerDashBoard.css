@@ -1,0 +1,330 @@
+﻿:root {
+    --primary-color: #5a67d8;
+    --primary-light: #e2e8f0;
+    --secondary-color: #63b3ed;
+    --bg-color: #f8f9fc;
+    --card-bg: #ffffff;
+    --text-color-primary: #1a202c;
+    --text-color-secondary: #718096;
+    --border-color: #e2e8f0;
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --status-Completed-bg: #e5f5e0;
+    --status-Completed-text: #38a169;
+    --status-Pending-bg: #fff5e0;
+    --status-Pending-text: #e28a00;
+    --hire-btn-color: #38a169;
+    --reject-btn-color: #e53e3e;
+    --review-btn-color: #63b3ed;
+}
+
+
+.main-container {
+   padding: 2%;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.stat-title {
+    color: var(--text-color-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.stat-icon {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color-primary);
+    margin-bottom: 0.25rem;
+}
+
+.stat-description {
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+}
+
+/* Interviews Section */
+.interviews-section {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.section-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color-primary);
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    color: var(--text-color-secondary);
+    font-size: 0.95rem;
+}
+
+/* Interview List & Cards */
+.interview-list {
+    padding: 0;
+}
+
+.interview-card {
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: background-color 0.2s, transform 0.2s ease;
+}
+
+    .interview-card:last-child {
+        border-bottom: none;
+    }
+
+    .interview-card:hover {
+        background-color: var(--bg-color);
+    }
+
+.interview-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.interview-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.interview-info {
+    flex: 1;
+    min-width: 150px;
+}
+
+.interview-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color-primary);
+    margin-bottom: 0.25rem;
+}
+
+.interview-role {
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+}
+
+.interview-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.interview-time {
+    color: var(--text-color-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.interview-status {
+    padding: 0.4rem 0.8rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-Completed {
+    background: var(--status-Completed-bg);
+    color: var(--status-Completed-text);
+}
+
+.status-Pending {
+    background: var(--status-Pending-bg);
+    color: var(--status-Pending-text);
+}
+
+/* Action Buttons */
+.interview-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.join-meet-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .join-meet-btn:hover {
+        background-color: #434190;
+        box-shadow: 0 4px 10px rgba(90, 103, 216, 0.4);
+    }
+
+.option-btn {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color-secondary);
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .option-btn:hover {
+        background-color: var(--bg-color);
+    }
+
+    .option-btn.hire {
+        color: var(--hire-btn-color);
+        border-color: #bcf2c2;
+    }
+
+    .option-btn.reject {
+        color: var(--reject-btn-color);
+        border-color: #fbd3d3;
+    }
+
+/* Pagination styles */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    gap: 0.5rem;
+}
+
+.pagination-button {
+    background: var(--bg-color);
+    color: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+    .pagination-button:hover:not(.active) {
+        background: var(--border-color);
+    }
+
+    .pagination-button.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+/* Toast Styles */
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1002;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #333;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .toast.success {
+        border-left: 5px solid var(--status-Completed-text);
+    }
+
+    .toast.error {
+        border-left: 5px solid var(--reject-btn-color);
+    }
+
+    .toast .toast-icon {
+        font-size: 1.2rem;
+    }
+
+    .toast.success .toast-icon {
+        color: var(--status-Completed-text);
+    }
+
+    .toast.error .toast-icon {
+        color: var(--reject-btn-color);
+    }

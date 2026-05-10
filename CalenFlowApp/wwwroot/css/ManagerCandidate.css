@@ -1,0 +1,809 @@
+﻿.container {
+    margin-top: 2%;
+}
+
+/* Statistics Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.stat-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.stat-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+}
+
+    .stat-icon.total {
+        color: #3b82f6;
+    }
+
+    .stat-icon.Active {
+        color: #3545ab;
+    }
+
+    .stat-icon.hired {
+        color: #22c55e;
+    }
+
+    .stat-icon.rejected {
+        color: #ef4444;
+    }
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Management Section */
+.management-section {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.section-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+    .section-title h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .section-title p {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+.add-candidate-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .add-candidate-btn:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .add-candidate-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+/* Search and Filters */
+.search-filters {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+}
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: #64748b;
+}
+
+.filter-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background: white;
+    color: #374151;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.results-info {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+/* Candidate Cards */
+.candidates-list {
+    padding: 1.5rem;
+}
+
+.candidate-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+    .candidate-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+.candidate-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.candidate-avatar {
+    width: 48px;
+    height: 48px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.candidate-info {
+    flex: 1;
+}
+
+.candidate-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.candidate-position {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.candidate-company {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.candidate-status {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+    .status-badge.Active {
+        background: #adb3db;
+        color: #3545ab;
+    }
+
+    .status-badge.interview-scheduled {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-badge.Completed {
+        background: #f3e8ff;
+        color: #7c3aed;
+    }
+
+    .status-badge.rejected {
+        background: #f3e8ff;
+        color: #f20534;
+    }
+
+    .status-badge.hired {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+.candidate-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 0.375rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+    .action-btn:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    .action-btn.hired {
+        background: #22c55e;
+        color: white;
+        border-color: #22c55e;
+    }
+
+        .action-btn.hired:hover {
+            background: #16a34a;
+        }
+
+    .action-btn.rejected {
+        background: #ef4444;
+        color: white;
+        border-color: #ef4444;
+    }
+
+        .action-btn.rejected:hover {
+            background: #dc2626;
+        }
+
+    .action-btn.reschedule {
+        background: #f59e0b;
+        color: white;
+        border-color: #f59e0b;
+    }
+
+        .action-btn.reschedule:hover {
+            background: #d97706;
+        }
+
+    .action-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+/* CV Section */
+.candidate-content {
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.cv-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cv-preview {
+    width: 180px;
+    height: 240px;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.5rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+    .cv-preview:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    .cv-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.cv-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #64748b;
+}
+
+    .cv-placeholder svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 0.5rem;
+    }
+
+.cv-label {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #64748b;
+    text-align: center;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+    .contact-item svg {
+        width: 16px;
+        height: 16px;
+    }
+
+.interview-schedule {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.schedule-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+}
+
+.schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 0.5rem;
+}
+
+.schedule-icon {
+    width: 20px;
+    height: 20px;
+    color: #3b82f6;
+}
+
+    .schedule-icon.In-person {
+        color: #22c55e;
+    }
+
+.schedule-details {
+    flex: 1;
+}
+
+.schedule-date {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.schedule-type {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.schedule-status {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+    .schedule-status.Pending {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .schedule-status.Completed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .schedule-status.Active {
+        background: #adb3db;
+        color: #3545ab;
+    }
+
+.schedule-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.pagination-info {
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #64748b;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+    .pagination-btn:hover:not(:disabled) {
+        background: #f9fafb;
+        border-color: #9ca3af;
+        color: #374151;
+    }
+
+    .pagination-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .pagination-btn.Active {
+        background: #adb3db;
+        color: #3545ab;
+        border-color: #3b82f6;
+    }
+
+    .pagination-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+/* Modal Styles */
+.modal-overlay-cv {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+    .modal-overlay-cv.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+.modal-cv {
+    background: white;
+    border-radius: 0.75rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay-cv.show .modal-cv {
+    transform: scale(1);
+}
+
+.modal-header-cv {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.modal-title-cv {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.modal-close-cv {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s ease;
+}
+
+    .modal-close-cv:hover {
+        background: #f1f5f9;
+    }
+
+.modal-content-cv {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-footer-cv {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+
+/* CV Modal */
+.cv-modal {
+    max-width: 800px;
+}
+
+.cv-image {
+    width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .candidate-content {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .cv-section {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .cv-preview {
+        width: 120px;
+        height: 160px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .search-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .candidate-actions {
+        flex-wrap: wrap;
+    }
+
+    .modal {
+        width: 95%;
+        margin: 1rem;
+    }
+}
+
+.Pending-request {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    background: #fef3c7;
+    border-radius: 0.5rem;
+    border-left: 4px solid #f59e0b;
+}
+
+.request-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #92400e;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.approval-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+.action-btn.join-meet {
+    background: #4285f4;
+    color: white;
+    border-color: #4285f4;
+}
+
+    .action-btn.join-meet:hover {
+        background: #3367d6;
+    }
+.action-btn.approve {
+    background: #22c55e;
+    color: white;
+    border-color: #22c55e;
+}
+
+    .action-btn.approve:hover {
+        background: #16a34a;
+    }
+
+.action-btn.reject-schedule {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+    .action-btn.reject-schedule:hover {
+        background: #dc2626;
+    }
+
+.status-badge.Pending {
+    background: #fef3c7;
+    color: #92400e;
+}

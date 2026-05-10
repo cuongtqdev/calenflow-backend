@@ -1,0 +1,511 @@
+﻿@Html.AntiForgeryToken()
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <div class="login-container">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title" id="heroTitle">Welcome to Calenflow</h1>
+                <p class="hero-subtitle" id="heroSubtitle">Continue your journey to streamlined interview scheduling with our AI-powered platform.</p>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">👥</div>
+                        <div class="feature-text">Smart candidate matching</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📧</div>
+                        <div class="feature-text">Automated notifications</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📅</div>
+                        <div class="feature-text">Calendar integrations</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <div class="stat-item">
+                    <div class="stat-number">10K+</div>
+                    <div class="stat-label">Companies</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1M+</div>
+                    <div class="stat-label">Interviews</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+            </div>
+        </div>
+        <div class="auth-section">
+            <div class="auth-form-container">
+                <form class="auth-form" id="loginForm">
+                    <div class="form-header">
+                        <h2 class="form-title">Welcome back</h2>
+                    </div>
+
+                    <button type="button" class="google-btn" onclick="signInWithGoogle()">
+                        <div class="google-icon"></div>
+                        Continue with Google
+                    </button>
+
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="loginEmail">User Name</label>
+                        <input type="email"
+                            id="loginEmail"
+                            class="form-input"
+                            placeholder="yourusername@calenflow.vn"
+                            required>
+                        <div class="error-message" id="loginEmailError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">🔒 Password</label>
+                        <input type="password"
+                            id="loginPassword"
+                            class="form-input"
+                            placeholder="Enter your password"
+                            required>
+                        <div class="error-message" id="loginPasswordError"></div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        Sign in
+                        <span>→</span>
+                    </button>
+
+                    <div class="form-links">
+                        <div class="switch-link">
+                            Don't have an account? <a onclick="switchToSignup()">Sign up</a>
+                        </div>
+                        <a onclick="forgotPassword()">Forgot your password?</a>
+                    </div>
+                </form>
+
+                <form class="auth-form" id="signupForm" style="display: none;">
+                    <div class="form-header">
+                        <h2 class="form-title">Create account</h2>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="signupUsername">👤 Username</label>
+                        <input type="text"
+                            id="signupUsername"
+                            class="form-input"
+                            placeholder="Enter yourusername@calenflow.vn"
+                            required>
+                        <div class="error-message" id="signupUsernameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="signupPassword">🔒 Password</label>
+                        <input type="password"
+                            id="signupPassword"
+                            class="form-input"
+                            placeholder="Create a password"
+                            required>
+                        <div class="password-strength" id="passwordStrength">
+                            <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                        </div>
+                        <div class="error-message" id="signupPasswordError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword">🔒 Confirm Password</label>
+                        <input type="password"
+                            id="confirmPassword"
+                            class="form-input"
+                            placeholder="Confirm your password"
+                            required>
+                        <div class="error-message" id="confirmPasswordError"></div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        Create account
+                        <span>→</span>
+                    </button>
+
+                    <div class="form-links">
+                        <div class="switch-link">
+                            Already have an account? <a onclick="switchToLogin()">Sign in</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<script>
+    let currentForm = 'login';
+
+    // Switch between forms
+    function switchToSignup() {
+        if (currentForm === 'login') {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const heroTitle = document.getElementById('heroTitle');
+            const heroSubtitle = document.getElementById('heroSubtitle');
+
+            // Animate form transition
+            loginForm.classList.add('slide-out');
+
+            setTimeout(() => {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+                signupForm.classList.add('slide-in');
+
+                // Update hero content
+                heroTitle.textContent = 'Join Calendflow Today';
+                heroSubtitle.textContent = 'Start your journey to streamlined interview scheduling with our AI-powered platform.';
+
+                currentForm = 'signup';
+            }, 250);
+        }
+    }
+
+    function switchToLogin() {
+        if (currentForm === 'signup') {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const heroTitle = document.getElementById('heroTitle');
+            const heroSubtitle = document.getElementById('heroSubtitle');
+
+            // Animate form transition
+            signupForm.classList.remove('slide-in');
+            signupForm.classList.add('slide-out');
+
+            setTimeout(() => {
+                signupForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                loginForm.classList.remove('slide-out');
+                loginForm.classList.add('slide-in');
+
+                // Update hero content
+                heroTitle.textContent = 'Welcome Back to Calendflow';
+                heroSubtitle.textContent = 'Continue your journey to streamlined interview scheduling with our AI-powered platform.';
+
+                currentForm = 'login';
+            }, 250);
+        }
+    }
+
+    // Form validation
+    function validateEmail(email) {
+        const re = /^[^\s]+[^\s]+\.[^\s]+$/;
+        return re.test(email);
+    }
+
+    function validatePassword(password) {
+        return password.length >= 8;
+    }
+
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+        return strength;
+    }
+
+    function showError(inputId, errorId, message) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        input.classList.add('error');
+        error.textContent = message;
+        error.classList.add('show');
+    }
+
+    function clearError(inputId, errorId) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        input.classList.remove('error');
+        error.classList.remove('show');
+    }
+     function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#22c55e' : '#ef4444'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                font-size: 0.9rem;
+                z-index: 10000;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+            `;
+
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }  {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 4000);
+        }
+    // Login form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        let isValid = true;
+
+        // Clear previous errors
+        clearError('loginEmail', 'loginEmailError');
+        clearError('loginPassword', 'loginPasswordError');
+
+        // Validate email
+        if (!email) {
+            showError('loginEmail', 'loginEmailError', 'Email is required');
+            isValid = false;
+        } else if (!validateEmail(email)) {
+            showError('loginEmail', 'loginEmailError', 'Please enter a valid email');
+            isValid = false;
+        }
+
+        // Validate password
+        if (!password) {
+            showError('loginPassword', 'loginPasswordError', 'Password is required');
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        // Add loading state
+        document.body.classList.add('loading');
+
+        // Simulate login process
+        setTimeout(() => {
+                fetch('/Auth/SignIn', {
+                    method: 'POST',
+                    headers: {
+                         'Content-Type': 'application/json',
+                         'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ Email: email, Password: password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.body.classList.remove('loading');
+                        showToast(data.message, 'success');
+                        window.location.href = '@Url.Action("Home", "Guest")';
+                    } else {
+                        document.body.classList.remove('loading');
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error("Error updating status:", err);
+                    document.body.classList.remove('loading');
+                    showToast("Something went wrong!", "error");
+                });
+        }, 2000);
+    });
+
+    // Signup form submission
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('signupUsername').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        let isValid = true;
+
+        // Clear previous errors
+        clearError('signupUsername', 'signupUsernameError');
+        clearError('signupPassword', 'signupPasswordError');
+        clearError('confirmPassword', 'confirmPasswordError');
+
+        // Validate username
+        if (!username) {
+            showError('signupUsername', 'signupUsernameError', 'Username is required');
+            isValid = false;
+        } else if (username.length < 3) {
+            showError('signupUsername', 'signupUsernameError', 'Username must be at least 3 characters');
+            isValid = false;
+        }
+
+        // Validate password
+        if (!password) {
+            showError('signupPassword', 'signupPasswordError', 'Password is required');
+            isValid = false;
+        } else if (!validatePassword(password)) {
+            showError('signupPassword', 'signupPasswordError', 'Password must be at least 8 characters');
+            isValid = false;
+        }
+
+        // Validate confirm password
+        if (!confirmPassword) {
+            showError('confirmPassword', 'confirmPasswordError', 'Please confirm your password');
+            isValid = false;
+        } else if (password !== confirmPassword) {
+            showError('confirmPassword', 'confirmPasswordError', 'Passwords do not match');
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        // Add loading state
+        document.body.classList.add('loading');
+
+        // Simulate signup process
+        setTimeout(() => {
+                fetch('/Auth/SignUp', {
+                    method: 'POST',
+                    headers: {
+                         'Content-Type': 'application/json',
+                         'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ Username: username, Password: password, ConfirmPassword: confirmPassword })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.body.classList.remove('loading');
+                        showToast(data.message, 'success');
+                        window.location.href = '@Url.Action("Dashboard", "User")';
+                    } else {
+                        document.body.classList.remove('loading');
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error("Error updating status:", err);
+                    document.body.classList.remove('loading');
+                    showToast("Something went wrong!", "error");
+                });
+        }, 2000);
+    });
+
+    // Password strength indicator
+    document.getElementById('signupPassword').addEventListener('input', function() {
+        const password = this.value;
+        const strengthIndicator = document.getElementById('passwordStrength');
+        const strengthBar = document.getElementById('passwordStrengthBar');
+
+        if (password.length > 0) {
+            strengthIndicator.classList.add('show');
+            const strength = checkPasswordStrength(password);
+
+            strengthBar.className = 'password-strength-bar';
+            if (strength <= 2) {
+                strengthBar.classList.add('weak');
+            } else if (strength <= 4) {
+                strengthBar.classList.add('medium');
+            } else {
+                strengthBar.classList.add('strong');
+            }
+        } else {
+            strengthIndicator.classList.remove('show');
+        }
+    });
+
+    // Google Sign In/Up
+    function signInWithGoogle() {
+        window.location.href = '@Url.Action("LoginGoogle", "Auth", new { returnUrl = "/" })';
+    }
+
+
+    // Forgot Password
+    function forgotPassword() {
+        const email = document.getElementById('loginEmail').value;
+        if (email) {
+            alert(`Password reset link will be sent to ${email}`);
+        } else {
+            const userEmail = prompt('Please enter your email address:');
+            if (userEmail) {
+                alert(`Password reset link will be sent to ${userEmail}`);
+            }
+        }
+    }
+
+    // Input focus effects
+    document.querySelectorAll('.form-input').forEach(input => {
+        input.addEventListener('focus', function() {
+            clearError(this.id, this.id + 'Error');
+        });
+    });
+
+    // Feature items hover animation
+    document.querySelectorAll('.feature-item').forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(10px) scale(1.02)';
+        });
+
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0) scale(1)';
+        });
+    });
+
+    // Stats counter animation on page load
+    function animateStats() {
+        const statNumbers = document.querySelectorAll('.stat-number');
+        const targets = ['10K+', '1M+', '99%'];
+
+        statNumbers.forEach((stat, index) => {
+            let current = 0;
+            const target = targets[index];
+            const increment = index === 0 ? 100 : index === 1 ? 10000 : 1;
+            const maxValue = index === 0 ? 10000 : index === 1 ? 1000000 : 99;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= maxValue) {
+                    stat.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    if (index === 0) {
+                        stat.textContent = Math.floor(current / 1000) + 'K+';
+                    } else if (index === 1) {
+                        stat.textContent = Math.floor(current / 1000000) + 'M+';
+                    } else {
+                        stat.textContent = current + '%';
+                    }
+                }
+            }, 50);
+        });
+    }
+
+    // Initialize animations when page loads
+    window.addEventListener('load', function() {
+        setTimeout(animateStats, 500);
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Escape key to switch forms
+        if (e.key === 'Escape') {
+            if (currentForm === 'signup') {
+                switchToLogin();
+            }
+        }
+    });
+</script>
+@section Styles {
+    <link rel="stylesheet" href="~/css/Login.css" />
+}

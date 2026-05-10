@@ -1,0 +1,295 @@
+﻿.main-content {
+    background-color: white;
+    padding: 2%;
+    border-radius: 3%;
+    width: 95%;
+    max-width: 1200px;
+    justify-self: center;
+    margin-right: 1.5%;
+}
+
+/* Role Switch Notification */
+.role-notification {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #dcfce7;
+    color: #166534;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid #bbf7d0;
+}
+
+    .role-notification::before {
+        content: "✓";
+        background: #22c55e;
+        color: white;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+    .stat-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stat-title {
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.stat-icon {
+    width: 20px;
+    height: 20px;
+    color: #3b82f6;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.stat-description {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+/* Interviews Section */
+.interviews-section {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.section-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex; /* Bổ sung để căn chỉnh search input */
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.section-subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+/* Interview Cards */
+#interviewList {
+    padding: 0;
+}
+
+.interview-card {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+    .interview-card:hover {
+        background: #f8fafc;
+    }
+
+    .interview-card:last-child {
+        border-bottom: none;
+    }
+
+.interview-icon {
+    width: 40px;
+    height: 40px;
+    background: #eff6ff;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+    .interview-icon svg {
+        width: 20px;
+        height: 20px;
+        color: #3b82f6;
+    }
+
+.interview-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.interview-info {
+    flex: 1;
+}
+
+.interview-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.interview-company {
+    color: #3b82f6;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.interview-interviewer {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.interview-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.interview-date {
+    color: #1e293b;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.interview-time {
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.interview-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.status-confirmed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-Active {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* Các styles mới được thêm vào */
+.interview-status.status-Completed {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.join-meet-btn {
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    border: none;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+    .join-meet-btn:hover {
+        background-color: #2563eb;
+    }
+
+/* Styling for Search Input */
+.search-input {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    transition: border-color 0.3s;
+    width: 250px;
+}
+
+    .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+
+/* Styling for Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    gap: 0.5rem;
+}
+
+.pagination-button {
+    background: #f8fafc;
+    color: #3b82f6;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .pagination-button:hover:not(.active) {
+        background: #e2e8f0;
+    }
+
+    .pagination-button.active {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }

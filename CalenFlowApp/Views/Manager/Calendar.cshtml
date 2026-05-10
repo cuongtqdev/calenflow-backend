@@ -1,0 +1,813 @@
+﻿@Html.AntiForgeryToken()
+@model List<BusinessObjects.Models.Interview>
+@{
+	Layout = "~/Views/Shared/_LayoutSidebarManager.cshtml";
+}
+<div class="container-calendar-manager">
+	<div class="calendar-header">
+		<svg class="header-icon" viewBox="0 0 24 24" fill="none">
+			<rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" />
+			<line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" />
+			<line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" />
+			<line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" />
+		</svg>
+		<div class="header-info">
+			<h1>Interview Calendar</h1>
+			<p id="headerSubtitle">Manage your interview schedule - Jan 12 - Jan 18, 2025</p>
+		</div>
+	</div>
+
+	<div class="calendar-nav">
+		<div class="nav-left">
+			<div class="view-tabs">
+				<button class="view-tab" data-view="day" onclick="switchView('day')">Day</button>
+				<button class="view-tab active" data-view="week" onclick="switchView('week')">Week</button>
+				<button class="view-tab" data-view="month" onclick="switchView('month')">Month</button>
+			</div>
+
+			<div class="filters">
+				<div class="filter-group">
+					<svg class="filter-icon" viewBox="0 0 24 24" fill="none">
+						<polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46 22,3" stroke="currentColor" stroke-width="2" />
+					</svg>
+					<select class="filter-select" id="statusFilter" onchange="applyFilters()">
+						<option value="All Status">All Status</option>
+						<option value="Completed">Confirmed</option>
+						<option value="Pending">Pending</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<div class="nav-right">
+			<div class="date-nav">
+				<button class="nav-btn" onclick="navigateDate(-1)">
+					<svg viewBox="0 0 24 24" fill="none">
+						<polyline points="15,18 9,12 15,6" stroke="currentColor" stroke-width="2" />
+					</svg>
+				</button>
+				<span class="current-date" id="currentDate">Jan 12 - Jan 18, 2025</span>
+				<button class="nav-btn" onclick="navigateDate(1)">
+					<svg viewBox="0 0 24 24" fill="none">
+						<polyline points="9,18 15,12 9,6" stroke="currentColor" stroke-width="2" />
+					</svg>
+				</button>
+			</div>
+			<button class="today-btn" onclick="goToToday()">Today</button>
+			<span class="interview-count" id="interviewCount">0 interviews this period</span>
+		</div>
+	</div>
+
+	<div class="calendar-content" id="calendarContent">
+	</div>
+</div>
+
+<div class="modal-overlay-detail" id="interviewDetailModal">
+	<div class="modal-detail">
+		<div class="modal-header-detail">
+			<div class="modal-title-section-detail">
+				<svg class="modal-icon-detail" viewBox="0 0 24 24" fill="none">
+					<rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" />
+					<line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" />
+					<line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" />
+					<line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" />
+				</svg>
+				<h2 class="modal-title-detail">Interview Details</h2>
+			</div>
+			<button class="modal-close-detail" onclick="closeInterviewDetailModal()">&times;</button>
+		</div>
+
+		<p class="modal-subtitle-detail">Complete information about the scheduled interview</p>
+
+		<div class="modal-content-detail" id="modalContent">
+		</div>
+	</div>
+</div>
+
+<script>
+	class InterviewCalendar {
+		constructor() {
+			this.currentView = 'week';
+			this.currentDate = new Date();
+			console.log(this.currentDate);
+			this.currentPage = 1;
+			this.currentFilter = 'All Status';
+			this.itemsPerPage = 3;
+			this.interviews = [
+				@foreach (var interview in Model)
+				{
+					<text>
+							  {
+								id: @interview.InterviewId,
+								candidateName: "@interview.Candidate.CandidateNavigation.FirstName" + " @interview.Candidate.CandidateNavigation.LastName",
+								position: "@interview.Position",
+								company: "@interview.Hiring.HiringNavigation.Company.Name",
+								email: "@interview.Candidate.CandidateNavigation.Email",
+								date: "@interview.Date.ToString("yyyy-MM-dd")",
+								time: "@interview.Time.ToString("hh:mm tt")",
+								type: "@interview.Type",
+								meetLink: "@interview.LinkMeet",
+								interviewer: "@interview.Hiring.HiringNavigation.FirstName" + " @interview.Hiring.HiringNavigation.LastName",
+								status: "@interview.Status",
+								description: "@interview.Description"
+							   },
+					</text>
+				}
+			];
+
+			this.init();
+		}
+
+		init() {
+			this.renderCalendar();
+			this.updateDateDisplay();
+			this.updateInterviewCount();
+		}
+
+		switchView(view) {
+			this.currentView = view;
+
+			document.querySelectorAll('.view-tab').forEach(tab => {
+				tab.classList.remove('active');
+			});
+			document.querySelector(`[data-view="${view}"]`).classList.add('active');
+
+			this.renderCalendar();
+			this.updateDateDisplay();
+			this.updateInterviewCount();
+		}
+
+		renderCalendar() {
+			const content = document.getElementById('calendarContent');
+
+			switch (this.currentView) {
+				case 'day':
+					content.innerHTML = this.renderDayView();
+					break;
+				case 'week':
+					content.innerHTML = this.renderWeekView();
+					break;
+				case 'month':
+					content.innerHTML = this.renderMonthView();
+					break;
+			}
+		}
+
+		renderDayView() {
+			let dayInterviews = this.getInterviewsForDate(this.currentDate);
+			const dayName = this.currentDate.toLocaleDateString('en-US', {
+				weekday: 'long',
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			});
+			if (dayInterviews.length === 0) {
+				return `
+					<div class="empty-state">
+						<svg class="empty-icon" viewBox="0 0 24 24" fill="none">
+							<rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+							<line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/>
+							<line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>
+							<line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+						</svg>
+						<div class="empty-title">No interviews scheduled for this day</div>
+					</div>
+				`;
+			}
+			if ( this.currentFilter !== 'All Status' ) {
+				console.log(this.currentFilter);
+				dayInterviews = dayInterviews.filter(interview => interview.status === this.currentFilter);
+			} else if (this.currentFilter === 'All Status') {
+				console.log(this.currentFilter);
+				dayInterviews = this.getInterviewsForDate(this.currentDate);
+			}
+			const totalPages = Math.ceil(dayInterviews.length / this.itemsPerPage);
+			const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+			const endIndex = startIndex + this.itemsPerPage;
+			const currentPageInterviews = dayInterviews.slice(startIndex, endIndex); 
+			return `
+				<div class="day-view">
+					<div class="day-view-header">
+						<h2 class="day-title">${dayName}</h2>
+						<div class="day-view-stats">
+							${dayInterviews.length} interview${dayInterviews.length !== 1 ? 's' : ''} scheduled
+						</div>
+					</div>
+
+					${currentPageInterviews.map(interview => this.renderInterviewItem(interview)).join('')}
+
+					${totalPages > 1 ? this.renderDayPagination(totalPages, dayInterviews.length) : ''}
+				</div>
+			`;
+		}
+
+		renderDayPagination(totalPages, totalInterviews) {
+				const pages = [];
+				for (let i = 1; i <= totalPages; i++) {
+					pages.push(i);
+				}
+
+				const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
+				const endItem = Math.min(this.currentPage * this.itemsPerPage, totalInterviews);
+
+				return `
+					<div class="day-pagination">
+						<div class="pagination-info">
+							Showing ${startItem}-${endItem} of ${totalInterviews} interviews
+						</div>
+
+						<div class="pagination-controls">
+							<button class="pagination-btn"
+									onclick="changeDayPage(${this.currentPage - 1})"
+									${this.currentPage === 1 ? 'disabled' : ''}>
+								<svg viewBox="0 0 24 24" fill="none">
+									<polyline points="15,18 9,12 15,6" stroke="currentColor" stroke-width="2"/>
+								</svg>
+							</button>
+
+							<div class="pagination-pages">
+								${pages.map(page => `
+									<button class="pagination-btn ${page === this.currentPage ? 'active' : ''}"
+											onclick="changeDayPage(${page})">
+										${page}
+									</button>
+								`).join('')}
+							</div>
+
+							<button class="pagination-btn"
+									onclick="changeDayPage(${this.currentPage + 1})"
+									${this.currentPage === totalPages ? 'disabled' : ''}>
+								<svg viewBox="0 0 24 24" fill="none">
+									<polyline points="9,18 15,12 9,6" stroke="currentColor" stroke-width="2"/>
+								</svg>
+							</button>
+						</div>
+					</div>
+				`;
+			}
+
+		renderWeekView() {
+			const startOfWeek = new Date(this.currentDate);
+			startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+			const days = [];
+			for (let i = 0; i < 7; i++) {
+				const day = new Date(startOfWeek);
+				day.setDate(startOfWeek.getDate() + i);
+				days.push(day);
+			}
+
+			return `
+				<div class="week-view">
+					<div class="week-header">
+						${days.map(day => `
+							<div class="day-header">
+								<div class="day-name">${day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+								<div class="day-number">${day.getDate()}</div>
+							</div>
+						`).join('')}
+					</div>
+					${days.map(day => {
+						let dayInterviews = this.getInterviewsForDate(day);
+						if ( this.currentFilter !== 'All Status' ) {
+							dayInterviews = dayInterviews.filter(interview => interview.status === this.currentFilter);
+						} else if (this.currentFilter === 'All Status') {
+							dayInterviews = this.getInterviewsForDate(day);
+						}
+						return `
+							<div class="day-cell">
+								${dayInterviews.map(interview => this.renderWeekInterviewItem(interview)).join('')}
+							</div>
+						`;
+					}).join('')}
+				</div>
+			`;
+		}
+
+		renderMonthView() {
+			const year = this.currentDate.getFullYear();
+			const month = this.currentDate.getMonth();
+
+			const firstDay = new Date(year, month, 1);
+			const lastDay = new Date(year, month + 1, 0);
+			const startDate = new Date(firstDay);
+			startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+			const weeks = [];
+			const currentWeek = [];
+
+			for (let i = 0; i < 42; i++) {
+				const date = new Date(startDate);
+				date.setDate(startDate.getDate() + i);
+
+				currentWeek.push(date);
+
+				if (currentWeek.length === 7) {
+					weeks.push([...currentWeek]);
+					currentWeek.length = 0;
+				}
+			}
+
+			return `
+				<div class="month-view">
+					<div class="month-header">
+						${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => `
+							<div class="month-day-header">${day}</div>
+						`).join('')}
+					</div>
+					<div class="month-grid">
+						${weeks.map(week => `
+							<div class="month-week">
+								${week.map(date => this.renderMonthDay(date, month)).join('')}
+							</div>
+						`).join('')}
+					</div>
+				</div>
+			`;
+		}
+
+		renderMonthDay(date, currentMonth) {
+			let dayInterviews = this.getInterviewsForDate(date);
+			const isCurrentMonth = date.getMonth() === currentMonth;
+			const isToday = this.isToday(date);
+			const dayNumber = date.getDate();
+			if ( this.currentFilter !== 'All Status' ) {
+				dayInterviews = dayInterviews.filter(interview => interview.status === this.currentFilter);
+			} else if (this.currentFilter === 'All Status') {
+				dayInterviews = this.getInterviewsForDate(date);
+			}
+			return `
+				<div class="month-day ${!isCurrentMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}"
+					 onclick="selectMonthDay('${date.toISOString()}')">
+					<div class="month-day-number">${dayNumber}</div>
+					<div class="month-day-interviews">
+						${dayInterviews.slice(0, 3).map(interview => `
+							<div class="month-interview-item ${interview.status}"
+								 onclick="event.stopPropagation(); showInterviewDetails(${interview.id})"
+								 title="${interview.candidateName} - ${interview.time}">
+								<div class="month-interview-time">${interview.time}</div>
+								<div class="month-interview-name">${interview.candidateName}</div>
+								${this.getMonthInterviewTypeIcon(interview.type)}
+							</div>
+						`).join('')}
+						${dayInterviews.length > 3 ? `
+							<div class="month-more-interviews" onclick="event.stopPropagation(); showDayInterviews('${date.toISOString()}')">
+								+${dayInterviews.length - 3} more
+							</div>
+						` : ''}
+					</div>
+				</div>
+			`;
+		}
+
+		getMonthInterviewTypeIcon(type) {
+			if (type === 'Google-Meet') {
+				return `<svg class="month-interview-icon" viewBox="0 0 24 24" fill="none"><path d="M23 7L16 12L23 17V7Z" stroke="currentColor" stroke-width="2"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/></svg>`;
+			} else if (type === 'In-person') {
+				return `<svg class="month-interview-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+							<circle cx="9" cy="7" r="4"></circle>
+							<path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+							<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+						</svg>`;
+			}
+			return '';
+		}
+		changeDayPage(page) {
+				const dayInterviews = this.getInterviewsForDate(this.currentDate);
+				const totalPages = Math.ceil(dayInterviews.length / this.itemsPerPage);
+
+				if (page >= 1 && page <= totalPages) {
+					this.currentPage = page;
+					this.renderCalendar();
+				}
+		}
+
+		renderInterviewItem(interview) {
+			const isToday = this.isToday(interview.date);
+			const interviewDate = new Date(interview.date);
+			const isFuture = interviewDate >= new Date();
+			const showMeetLink = interview.type === 'Google-Meet' && (isToday || isFuture);
+			return `
+				<div class="interview-item">
+					<div class="interview-tags">
+						<span class="tag ${interview.status}">${interview.status}</span>
+					</div>
+
+					<div class="interview-time">
+						<div class="time-info">
+							<div class="time-main">${interview.time}</div>
+						</div>
+
+						${this.getInterviewTypeIcon(interview.type)}
+
+						<div class="interview-details">
+							<div class="candidate-name">${interview.candidateName}</div>
+							<div class="candidate-position">${interview.position}</div>
+							<div class="interviewer">Interviewer: ${interview.interviewer}</div>
+						</div>
+					</div>
+
+					${showMeetLink ? `
+						<div class="Google-Meet-action">
+							<a href="${interview.meetLink}" class="Google-Meet-btn" target="_blank">
+								<svg viewBox="0 0 24 24" fill="none">
+									<path d="M23 7L16 12L23 17V7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+									<rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+								</svg>
+								Join Google-Meet
+							</a>
+						</div>
+					` : `
+						<div class="interview-actions">
+							<button class="action-btn" onclick="showInterviewDetails(${interview.id})">
+								<svg viewBox="0 0 24 24" fill="none">
+									<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+									<path d="M9,9H15V15H9Z" stroke="currentColor" stroke-width="2"/>
+								</svg>
+								Details
+							</button>
+						</div>
+					`}
+				</div>
+			`;
+		}
+
+		renderWeekInterviewItem(interview) {
+			return `
+				<div class="week-interview-item" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem; padding: 0.75rem; margin-bottom: 0.5rem; cursor: pointer;" onclick="showInterviewDetails(${interview.id})">
+					<div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+						<span style="font-size: 0.8rem; font-weight: 600;">${interview.time}</span>
+						${this.getSmallInterviewTypeIcon(interview.type)}
+					</div>
+					<div style="font-size: 0.85rem; font-weight: 500; color: #1e293b; margin-bottom: 0.25rem;">${interview.candidateName}</div>
+					<div style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem;">${interview.position}</div>
+					<div style="display: flex; gap: 0.25rem;">
+						<span class="tag ${interview.status}" style="font-size: 0.7rem; padding: 0.125rem 0.5rem;">${interview.status}</span>
+					</div>
+				</div>
+			`;
+		}
+
+		getInterviewTypeIcon(type) {
+			if (type === 'Google-Meet') {
+				return `
+					<svg class="interview-type-icon" viewBox="0 0 24 24" fill="none">
+						<path d="M23 7L16 12L23 17V7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+						<rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+					</svg>
+				`;
+			} else if (type === 'In-person') {
+				return `
+					<svg class="interview-type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+						<circle cx="9" cy="7" r="4"></circle>
+						<path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+						<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+					</svg>
+				`;
+			}
+			return '';
+		}
+
+		getSmallInterviewTypeIcon(type) {
+			if (type === 'Google-Meet') {
+				return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="color: #3b82f6;"><path d="M23 7L16 12L23 17V7Z" stroke="currentColor" stroke-width="2"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/></svg>`;
+			} else if (type === 'In-person') {
+				return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="color: #22c55e;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+							<circle cx="9" cy="7" r="4"></circle>
+							<path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+							<path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`;
+			}
+			return '';
+		}
+
+		getInterviewsForDate(date) {
+			return this.interviews.filter(interview => {
+				const interviewDate = new Date(interview.date);
+				return interviewDate.toDateString() === date.toDateString();
+			}
+				
+			);
+		}
+
+		isToday(date) {
+			const interviewDate = new Date(date);
+			const today = new Date();
+			return interviewDate.toDateString() === today.toDateString();
+		}
+
+		navigateDate(direction) {
+			if (this.currentView === 'day') {
+				this.currentDate.setDate(this.currentDate.getDate() + direction);
+			} else if (this.currentView === 'week') {
+				this.currentDate.setDate(this.currentDate.getDate() + (direction * 7));
+			} else if (this.currentView === 'month') {
+				this.currentDate.setMonth(this.currentDate.getMonth() + direction);
+			}
+
+			this.renderCalendar();
+			this.updateDateDisplay();
+			this.updateInterviewCount();
+		}
+
+		goToToday() {
+			this.currentDate = new Date();
+			this.renderCalendar();
+			this.updateDateDisplay();
+			this.updateInterviewCount();
+		}
+
+		updateDateDisplay() {
+			const currentDateEl = document.getElementById('currentDate');
+			const headerSubtitle = document.getElementById('headerSubtitle');
+
+			let dateText = '';
+			let subtitleText = '';
+
+			if (this.currentView === 'day') {
+				dateText = this.currentDate.toLocaleDateString('en-US', {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				});
+				subtitleText = `Manage your interview schedule - ${dateText}`;
+			} else if (this.currentView === 'week') {
+				const startOfWeek = new Date(this.currentDate);
+				startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+				const endOfWeek = new Date(startOfWeek);
+				endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+				dateText = `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+				subtitleText = `Manage your interview schedule - ${dateText}`;
+			} else if (this.currentView === 'month') {
+				dateText = this.currentDate.toLocaleDateString('en-US', {
+					year: 'numeric',
+					month: 'long'
+				});
+				subtitleText = `Manage your interview schedule - ${dateText}`;
+			}
+
+			currentDateEl.textContent = dateText;
+			headerSubtitle.textContent = subtitleText;
+		}
+
+		updateInterviewCount() {
+			const countEl = document.getElementById('interviewCount');
+			let count = 0;
+			let periodText = '';
+
+			if (this.currentView === 'day') {
+				count = this.getInterviewsForDate(this.currentDate).length;
+				periodText = 'today';
+			} else if (this.currentView === 'week') {
+				const startOfWeek = new Date(this.currentDate);
+				startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+
+				for (let i = 0; i < 7; i++) {
+					const day = new Date(startOfWeek);
+					day.setDate(startOfWeek.getDate() + i);
+					count += this.getInterviewsForDate(day).length;
+				}
+				periodText = 'this period';
+			} else if (this.currentView === 'month') {
+				const year = this.currentDate.getFullYear();
+				const month = this.currentDate.getMonth();
+				const firstDay = new Date(year, month, 1);
+				const lastDay = new Date(year, month + 1, 0);
+
+				for (let d = firstDay; d <= lastDay; d.setDate(d.getDate() + 1)) {
+					count += this.getInterviewsForDate(new Date(d)).length;
+				}
+				periodText = 'this month';
+			}
+
+			countEl.textContent = `${count} interviews ${periodText}`;
+		}
+		fromInterviewDateToLocal(date) {
+			const d = new Date(date);
+			return d.toLocaleDateString('en-US', {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				});
+		}
+
+		showInterviewDetails(interviewId) {
+			const interview = this.interviews.find(i => i.id === interviewId);
+			if (!interview) return;
+
+			const modal = document.getElementById('interviewDetailModal');
+			const modalContent = document.getElementById('modalContent');
+
+			modalContent.innerHTML = `
+				<div class="detail-grid">
+					<div class="detail-section">
+						<h3>Candidate Information</h3>
+						<div class="detail-item">
+							<div class="detail-value large">${interview.candidateName}</div>
+							<div class="detail-value">${interview.email}</div>
+						</div>
+						<div class="detail-item">
+							<div class="detail-label">Position & Company</div>
+							<div class="detail-value">${interview.position}</div>
+							<div class="detail-value">${interview.company}</div>
+						</div>
+						<div class="detail-tags">
+							<span class="tag ${interview.status}">${interview.status}</span>
+						</div>
+					</div>
+
+					<div class="detail-section">
+						<h3>Date & Time</h3>
+						<div class="detail-item">
+							<div class="detail-value large">${this.fromInterviewDateToLocal(interview.date)}</div>
+							<div class="detail-value">${interview.time} </div>
+						</div>
+						<div class="detail-item">
+							<div class="detail-label">Interview Type & Location</div>
+							<div class="detail-value">${this.getInterviewTypeIcon(interview.type)} ${interview.type === 'Google-Meet' ? 'Video' : 'In-person'}</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="detail-item">
+					<div class="detail-label">Interviewer</div>
+					<div class="detail-value">${interview.interviewer}</div>
+				</div>
+
+				<div class="detail-description">
+					<h4>Description</h4>
+					<p>${interview.description}</p>
+				</div>
+			`;
+
+			modal.classList.add('show');
+			document.body.style.overflow = 'hidden';
+		}
+
+		calculateEndTime(startTime, duration) {
+			const [time, period] = startTime.split(' ');
+			const [hours, minutes] = time.split(':').map(Number);
+
+			let hour24 = hours;
+			if (period === 'PM' && hours !== 12) hour24 += 12;
+			if (period === 'AM' && hours === 12) hour24 = 0;
+
+			const startMinutes = hour24 * 60 + minutes;
+			const endMinutes = startMinutes + duration;
+
+			const endHour24 = Math.floor(endMinutes / 60);
+			const endMin = endMinutes % 60;
+
+			let endHour12 = endHour24;
+			let endPeriod = 'AM';
+
+			if (endHour24 >= 12) {
+				endPeriod = 'PM';
+				if (endHour24 > 12) endHour12 = endHour24 - 12;
+			}
+			if (endHour24 === 0) endHour12 = 12;
+
+			return `${endHour12}:${endMin.toString().padStart(2, '0')} ${endPeriod}`;
+		}
+
+		closeInterviewDetailModal() {
+			const modal = document.getElementById('interviewDetailModal');
+			modal.classList.remove('show');
+			document.body.style.overflow = '';
+		}
+		getFilteredInterviews() {
+			return this.interviews.filter(interviews => {
+				const matchesFilter = !this.currentFilter || interviews.status === this.currentFilter;
+
+				return matchesFilter;
+			});
+		}
+
+		applyFilters() {
+			this.currentFilter = document.getElementById('statusFilter').value;
+			this.renderCalendar();
+		}
+	}
+
+		function switchView(view) {
+		if (window.calendar) {
+			window.calendar.switchView(view);
+		}
+	}
+
+	function navigateDate(direction) {
+		if (window.calendar) {
+			window.calendar.navigateDate(direction);
+		}
+	}
+
+	function goToToday() {
+		if (window.calendar) {
+			window.calendar.goToToday();
+		}
+	}
+
+	function showInterviewDetails(interviewId) {
+		if (window.calendar) {
+			window.calendar.showInterviewDetails(interviewId);
+		}
+	}
+
+	function closeInterviewDetailModal() {
+		if (window.calendar) {
+			window.calendar.closeInterviewDetailModal();
+		}
+	}
+
+
+
+	function applyFilters() {
+		if (window.calendar) {
+			window.calendar.applyFilters();
+		}
+	}
+
+	function selectMonthDay(dateString) {
+		if (window.calendar) {
+			const selectedDate = new Date(dateString);
+			window.calendar.currentDate = selectedDate;
+			window.calendar.switchView('day');
+		}
+	}
+	function changeDayPage(page) {
+			if (window.calendar) {
+				window.calendar.changeDayPage(page);
+			}
+	}
+	function showDayInterviews(dateString) {
+		if (window.calendar) {
+			const selectedDate = new Date(dateString);
+			const dayInterviews = window.calendar.getInterviewsForDate(selectedDate);
+
+						const modal = document.getElementById('interviewDetailModal');
+			const modalContent = document.getElementById('modalContent');
+
+			modalContent.innerHTML = `
+				<div style="text-align: center; margin-bottom: 2rem;">
+					<h3 style="color: #1e293b; margin-bottom: 0.5rem;">
+						${selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+					</h3>
+					<p style="color: #64748b;">${dayInterviews.length} interviews scheduled</p>
+				</div>
+
+				<div style="display: flex; flex-direction: column; gap: 1rem;">
+					${dayInterviews.map(interview => `
+						<div style="background: #f8fafc; border-radius: 0.5rem; padding: 1rem; border-left: 4px solid ${interview.status === 'Completed' ? '#22c55e' : '#f59e0b'};">
+							<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+								<div>
+									<div style="font-weight: 600; color: #1e293b; margin-bottom: 0.25rem;">${interview.candidateName}</div>
+									<div style="color: #64748b; font-size: 0.9rem;">${interview.position}</div>
+								</div>
+								<div style="text-align: right;">
+									<div style="font-weight: 600; color: #1e293b;">${interview.time}</div>
+									<div style="color: #64748b; font-size: 0.8rem;">${interview.duration}min</div>
+								</div>
+							</div>
+							<div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+								<span class="tag ${interview.status}">${interview.status}</span>
+								<span class="tag ${interview.category}">${interview.category}</span>
+							</div>
+						</div>
+					`).join('')}
+				</div>
+
+				<div style="text-align: center; margin-top: 2rem;">
+					<button onclick="selectMonthDay('${dateString}')" style="background: #3b82f6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 500; cursor: pointer;">
+						View Day Details
+					</button>
+				</div>
+			`;
+
+			modal.classList.add('show');
+			document.body.style.overflow = 'hidden';
+		}
+	}
+
+		document.addEventListener('DOMContentLoaded', () => {
+		window.calendar = new InterviewCalendar();
+
+				document.getElementById('interviewDetailModal').addEventListener('click', (e) => {
+			if (e.target.id === 'interviewDetailModal') {
+				closeInterviewDetailModal();
+			}
+		});
+
+				document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape') {
+				closeInterviewDetailModal();
+			}
+		});
+	});
+</script>
+@section Styles {
+	<link rel="stylesheet" href="~/css/ManagerCalendar.css" />
+}

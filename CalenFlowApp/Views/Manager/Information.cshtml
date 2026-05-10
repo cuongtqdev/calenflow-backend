@@ -1,0 +1,253 @@
+﻿@Html.AntiForgeryToken()
+@model BusinessObjects.Models.User
+@{
+	Layout = "~/Views/Shared/_LayoutSidebarManager.cshtml";
+}
+<div class="container">
+    <div class="header">
+        <h1 class="page-title">Settings</h1>
+    </div>
+
+    <nav class="nav-tabs">
+        <a href="#" class="nav-tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>
+            Profile
+        </a>
+    </nav>
+
+    <div class="content-section active" id="profile-section">
+        <div class="section-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>
+            <h2 class="section-title">Personal Information</h2>
+        </div>
+        <p class="section-description">Update your personal details and contact information</p>
+
+        <form class="form-grid" id="profileForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <input type="text" id="firstName" class="form-input" placeholder="Enter your first name" value="@Model.FirstName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <input type="text" id="lastName" class="form-input" placeholder="Enter your last name" value="@Model.LastName">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email-manager" class="form-input" placeholder="Enter your email" value="@Model.Email">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone Number</label>
+                    <input type="tel" id="phone" class="form-input" placeholder="Enter your phone number" value="@Model.Phone">
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label class="form-label" for="bio">Bio</label>
+                <textarea id="bio" class="form-input form-textarea" placeholder="Tell us about yourself...">@Model.Bio</textarea>
+            </div>
+
+            <div class="action-buttons" id="profileActions">
+                <button type="button" class="btn btn-primary" id="editBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                    Edit Profile
+                </button>
+                <button type="submit" class="btn btn-primary" id="saveBtn" style="display: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17,21 17,13 7,13 7,21" />
+                        <polyline points="7,3 7,8 15,8" />
+                    </svg>
+                    Save Changes
+                </button>
+                <button type="button" class="btn btn-secondary" id="resetBtn" style="display: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="1,4 1,10 7,10" />
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                    </svg>
+                    Reset
+                </button>
+                <button type="button" class="btn btn-secondary" id="cancelBtn" style="display: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    class SettingsManager {
+        constructor() {
+            this.currentTab = 'profile';
+            this.originalFormData = {};
+            this.isEditMode = false; 
+            this.initEventListeners();
+            this.loadInitialData();
+            this.setViewMode();         
+        }
+
+        initEventListeners() {
+            document.getElementById('profileForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.saveProfile();
+            });
+
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                this.resetForm();
+            });
+
+            document.getElementById('editBtn').addEventListener('click', () => {
+                this.setEditMode();
+            });
+
+            document.getElementById('cancelBtn').addEventListener('click', () => {
+                this.cancelEdit();
+            });
+        }
+
+        loadInitialData() {
+            this.originalFormData = {
+                firstName: "@Model.FirstName",
+                lastName: "@Model.LastName",
+                email: "@Model.Email",
+                phone: "@Model.Phone",
+                bio: "@Model.Bio"
+            };
+        }
+
+        saveProfile() {
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email-manager').value,
+                phone: document.getElementById('phone').value,
+                bio: document.getElementById('bio').value
+            };
+            if (!formData.firstName || !formData.lastName || !formData.email) {
+                this.showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            const emailRegex = /^[^\s]+[^\s]+\.[^\s]+$/;
+            if (!emailRegex.test(formData.email)) {
+                this.showToast('Please enter a valid email address', 'error');
+                return;
+            }
+            fetch('/Manager/UpdateInformationHiring', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ Firstname: formData.firstName, Lastname: formData.lastName, Email: formData.email, Phone: formData.phone, Bio: formData.bio  })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.setViewMode();
+                    this.showToast(data.message);
+                } else {
+                this.showToast(data.message, 'error');
+                }
+            })
+            .catch(err => {
+                console.error("Error updating status:", err);
+                this.showToast("Something went wrong!", "error");
+            });
+        }
+
+        resetForm() {
+            document.getElementById('firstName').value = this.originalFormData.firstName;
+            document.getElementById('lastName').value = this.originalFormData.lastName;
+            document.getElementById('email-manager').value = this.originalFormData.email;
+            document.getElementById('phone').value = this.originalFormData.phone;
+            document.getElementById('bio').value = this.originalFormData.bio;
+
+            this.showToast('Form reset to original values');
+        }
+
+
+        showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+
+           setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                }
+                }, 300);
+            }, 4000);
+        }
+
+        setEditMode() {
+            this.isEditMode = true;
+
+            document.getElementById('firstName').readOnly = false;
+            document.getElementById('lastName').readOnly = false;
+            document.getElementById('email-manager').readOnly = false;
+            document.getElementById('phone').readOnly = false;
+            document.getElementById('bio').readOnly = false;
+
+            document.getElementById('editBtn').style.display = 'none';
+            document.getElementById('saveBtn').style.display = 'flex';
+            document.getElementById('resetBtn').style.display = 'flex';
+            document.getElementById('cancelBtn').style.display = 'flex';
+        }
+
+        setViewMode() {
+            this.isEditMode = false;
+
+              document.getElementById('firstName').readOnly = true;
+            document.getElementById('lastName').readOnly = true;
+            document.getElementById('email-manager').readOnly = true;
+            document.getElementById('phone').readOnly = true;
+            document.getElementById('bio').readOnly = true;
+
+            document.getElementById('editBtn').style.display = 'flex';
+            document.getElementById('saveBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        cancelEdit() {
+           this.resetForm();
+           this.setViewMode();
+        }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        new SettingsManager();
+    });
+</script>
+@section Styles {
+	<link rel="stylesheet" href="~/css/ManagerInformation.css" />
+}

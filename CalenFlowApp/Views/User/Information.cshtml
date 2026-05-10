@@ -1,0 +1,513 @@
+﻿@Html.AntiForgeryToken()
+@model BusinessObjects.Models.User
+@{
+	Layout = "~/Views/Shared/_LayoutSidebar.cshtml";
+}
+<div class="container">
+	<div class="header-infor">
+		<h1 class="page-title">Settings</h1>
+	</div>
+
+	<nav class="nav-tabs">
+		<a href="#" class="nav-tab active" data-tab="profile">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+				<circle cx="12" cy="7" r="4" />
+			</svg>
+			Profile
+		</a>
+		<a href="#" class="nav-tab" data-tab="cv">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+				<polyline points="14,2 14,8 20,8" />
+				<line x1="16" y1="13" x2="8" y2="13" />
+				<line x1="16" y1="17" x2="8" y2="17" />
+				<polyline points="10,9 9,9 8,9" />
+			</svg>
+			Your CV
+		</a>
+	</nav>
+
+	<div class="content-section active" id="profile-section">
+		<div class="section-header">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+				<circle cx="12" cy="7" r="4" />
+			</svg>
+			<h2 class="section-title">Personal Information</h2>
+		</div>
+		<p class="section-description">Update your personal details and contact information</p>
+
+		<form class="form-grid" id="profileForm">
+			<div class="form-row">
+				<div class="form-group">
+					<label class="form-label" for="firstName">First Name</label>
+					<input type="text" id="firstName" class="form-input" placeholder="Enter your first name" value="@Model.FirstName">
+				</div>
+				<div class="form-group">
+					<label class="form-label" for="lastName">Last Name</label>
+					<input type="text" id="lastName" class="form-input" placeholder="Enter your last name" value="@Model.LastName">
+				</div>
+			</div>
+
+			<div class="form-row">
+				<div class="form-group">
+					<label class="form-label" for="email">Email Address</label>
+					<input type="email" id="email" class="form-input" placeholder="Enter your email" value="@Model.Email">
+				</div>
+				<div class="form-group">
+					<label class="form-label" for="phone">Phone Number</label>
+					<input type="tel" id="phone" class="form-input" placeholder="Enter your phone number" value="@Model.Phone">
+				</div>
+			</div>
+
+			<div class="form-group full-width">
+				<label class="form-label" for="bio">Bio</label>
+				<textarea id="bio" class="form-input form-textarea" placeholder="Tell us about yourself...">@Model.Bio</textarea>
+			</div>
+
+			<div class="action-buttons" id="profileActions">
+				<button type="button" class="btn btn-primary" id="editBtn">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+						<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+					</svg>
+					Edit Profile
+				</button>
+				<button type="submit" class="btn btn-primary" id="saveBtn" style="display: none;">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+						<polyline points="17,21 17,13 7,13 7,21" />
+						<polyline points="7,3 7,8 15,8" />
+					</svg>
+					Save Changes
+				</button>
+				<button type="button" class="btn btn-secondary" id="resetBtn" style="display: none;">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<polyline points="1,4 1,10 7,10" />
+						<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+					</svg>
+					Reset
+				</button>
+				<button type="button" class="btn btn-secondary" id="cancelBtn" style="display: none;">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<line x1="18" y1="6" x2="6" y2="18" />
+						<line x1="6" y1="6" x2="18" y2="18" />
+					</svg>
+					Cancel
+				</button>
+			</div>
+		</form>
+	</div>
+
+	<div class="content-section" id="cv-section">
+		<div class="section-header">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+				<polyline points="14,2 14,8 20,8" />
+				<line x1="16" y1="13" x2="8" y2="13" />
+				<line x1="16" y1="17" x2="8" y2="17" />
+				<polyline points="10,9 9,9 8,9" />
+			</svg>
+			<h2 class="section-title">Your CV</h2>
+		</div>
+		<p class="section-description">Upload and manage your CV document</p>
+
+		<div class="cv-section">
+			<div class="cv-upload-area" id="cvUploadArea">
+				<svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+					<polyline points="14,2 14,8 20,8" />
+					<line x1="16" y1="13" x2="8" y2="13" />
+					<line x1="16" y1="17" x2="8" y2="17" />
+					<polyline points="10,9 9,9 8,9" />
+				</svg>
+				<div class="upload-text">Click to upload your CV</div>
+				<div class="upload-subtext">PDF, DOC, DOCX, JPG, PNG up to 10MB</div>
+				<input type="file" class="file-input" id="cvFileInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+			</div>
+
+			<div class="cv-display" id="cvDisplay">
+				<div class="cv-image-container" id="cvImageContainer" style="display: none;">
+					<img class="cv-image" id="cvImage" alt="Your CV">
+					<div class="cv-file-info">
+						<div class="cv-file-name" id="cvImageName">My_Resume.pdf</div>
+						<div class="cv-file-details" id="cvImageDetails">2.3 MB • Uploaded 2 days ago</div>
+					</div>
+				</div>
+
+				<div class="cv-non-image" id="cvNonImage" style="display: none;">
+					<svg class="cv-non-image-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+						<polyline points="14,2 14,8 20,8" />
+						<line x1="16" y1="13" x2="8" y2="13" />
+						<line x1="16" y1="17" x2="8" y2="17" />
+						<polyline points="10,9 9,9 8,9" />
+					</svg>
+					<div class="cv-non-image-text">Your CV Document</div>
+					<div class="cv-non-image-subtext">Click "Change CV" to view or replace this document</div>
+					<div class="cv-non-image-info">
+						<div class="cv-file-name" id="cvNonImageName">My_Resume.pdf</div>
+						<div class="cv-file-details" id="cvNonImageDetails">2.3 MB • Uploaded 2 days ago</div>
+					</div>
+				</div>
+
+				<div class="cv-actions">
+					<button class="cv-action-btn primary" id="changeCV">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+							<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+						</svg>
+						Change CV
+					</button>
+					<button class="cv-action-btn danger" id="deleteCV">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<polyline points="3,6 5,6 21,6" />
+							<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+							<line x1="10" y1="11" x2="10" y2="17" />
+							<line x1="14" y1="11" x2="14" y2="17" />
+						</svg>
+						Delete CV
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	class SettingsManager {
+		constructor() {
+			this.currentTab = 'profile';
+			this.currentCV = null;
+			this.cvUrl = "@Url.Content("~/" + Model.Candidate.UrlCv)";
+			this.originalFormData = {};
+			this.isEditMode = false;
+			this.initEventListeners();
+			this.loadInitialData();
+			this.checkExistingCV();
+			this.setViewMode();             }
+
+		initEventListeners() {
+			document.querySelectorAll('.nav-tab').forEach(tab => {
+				tab.addEventListener('click', (e) => {
+					e.preventDefault();
+					const tabName = tab.getAttribute('data-tab');
+					this.switchTab(tabName);
+				});
+			});
+
+			document.getElementById('profileForm').addEventListener('submit', (e) => {
+				e.preventDefault();
+				this.saveProfile();
+			});
+
+			document.getElementById('resetBtn').addEventListener('click', () => {
+				this.resetForm();
+			});
+
+			document.getElementById('editBtn').addEventListener('click', () => {
+				this.setEditMode();
+			});
+
+			document.getElementById('cancelBtn').addEventListener('click', () => {
+				this.cancelEdit();
+			});
+
+			document.getElementById('cvUploadArea').addEventListener('click', () => {
+				document.getElementById('cvFileInput').click();
+			});
+
+			document.getElementById('cvFileInput').addEventListener('change', (e) => {
+				if (e.target.files.length > 0) {
+					this.handleCVUpload(e.target.files[0]);
+				}
+			});
+
+			document.getElementById('changeCV').addEventListener('click', () => {
+				document.getElementById('cvFileInput').click();
+			});
+
+			document.getElementById('deleteCV').addEventListener('click', () => {
+				this.deleteCV();
+			});
+
+			const uploadArea = document.getElementById('cvUploadArea');
+			uploadArea.addEventListener('dragover', (e) => {
+				e.preventDefault();
+				uploadArea.classList.add('dragover');
+			});
+
+			uploadArea.addEventListener('dragleave', () => {
+				uploadArea.classList.remove('dragover');
+			});
+
+			uploadArea.addEventListener('drop', (e) => {
+				e.preventDefault();
+				uploadArea.classList.remove('dragover');
+				const files = e.dataTransfer.files;
+				if (files.length > 0) {
+					this.handleCVUpload(files[0]);
+				}
+			});
+		}
+
+		switchTab(tabName) {
+			document.querySelectorAll('.nav-tab').forEach(tab => {
+				tab.classList.remove('active');
+			});
+			document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+			document.querySelectorAll('.content-section').forEach(section => {
+				section.classList.remove('active');
+			});
+			document.getElementById(`${tabName}-section`).classList.add('active');
+			this.currentTab = tabName;
+		}
+
+		loadInitialData() {
+			this.originalFormData = {
+				firstName: document.getElementById('firstName').value,
+				lastName: document.getElementById('lastName').value,
+				email: document.getElementById('email').value,
+				phone: document.getElementById('phone').value,
+				bio: document.getElementById('bio').value
+			};
+			this.cvUrl = "@Url.Content("~" + Model.Candidate.UrlCv)";
+			console.log('cvurl, ' + this.cvUrl);
+		}
+
+		checkExistingCV() {
+			const hasExistingCV = this.cvUrl;
+			if (hasExistingCV) {
+				// const cvData = JSON.parse(hasExistingCV);
+				// this.currentCV = cvData;
+				this.showCVDisplay(this.cvUrl);
+			}
+		}
+
+		saveProfile() {
+			const formData = {
+				firstName: document.getElementById('firstName').value,
+				lastName: document.getElementById('lastName').value,
+				email: document.getElementById('email').value,
+				phone: document.getElementById('phone').value,
+				bio: document.getElementById('bio').value
+			};
+
+			if (!formData.firstName || !formData.lastName || !formData.email) {
+				this.showToast('Please fill in all required fields', 'error');
+				return;
+			}
+
+			const emailRegex = /^[^\s]+[^\s]+\.[^\s]+$/;
+			if (!emailRegex.test(formData.email)) {
+				this.showToast('Please enter a valid email address', 'error');
+				return;
+			}
+			fetch('/User/UpdateInformationCandidate', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+				},
+				body: JSON.stringify({ Firstname: formData.firstName, Lastname: formData.lastName, Email: formData.email, Phone: formData.phone, Bio: formData.bio  })
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					this.originalFormData = { ...formData };
+					this.setViewMode();
+					this.showToast('Profile saved successfully!');
+				} else {
+				this.showToast(data.message, 'error');
+				}
+			})
+			.catch(err => {
+				console.error("Error updating status:", err);
+				this.showToast("Something went wrong!", "error");
+			});
+		}
+
+		resetForm() {
+			document.getElementById('firstName').value = this.originalFormData.firstName;
+			document.getElementById('lastName').value = this.originalFormData.lastName;
+			document.getElementById('email').value = this.originalFormData.email;
+			document.getElementById('phone').value = this.originalFormData.phone;
+			document.getElementById('bio').value = this.originalFormData.bio;
+
+			this.showToast('Form reset to original values');
+		}
+
+		handleCVUpload(file) {
+			console.log(file);
+			const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/jpg', 'image/png'];
+			if (!allowedTypes.includes(file.type)) {
+				this.showToast('Please upload a PDF, DOC, DOCX, JPG, or PNG file', 'error');
+				return;
+			}
+
+			if (file.size > 10 * 1024 * 1024) {
+				this.showToast('File size must be less than 10MB', 'error');
+				return;
+			}
+			const formData = new FormData();
+			formData.append('file', file);
+			formData.append("userId", "@Model.UserId");
+			console.log('form data, ', formData);
+			fetch("/User/UploadCV", {
+				method: "POST",
+				body: formData
+			})
+			.then(res => res.json())
+			.then(data => {
+				if (data.success) {
+					this.currentCV = {
+						name: file.name,
+						size: this.formatFileSize(file.size),
+						type: file.type,
+						uploadDate: new Date().toISOString(),
+						url: data.filePath  // Đường dẫn server trả về
+				};
+				this.cvUrl = data.filePath;
+				this.showCVDisplay(this.currentCV.url);
+				this.showToast('CV uploaded successfully!');
+				} else {
+						this.showToast(data.message, 'error');
+					return;
+				}
+			})
+			.catch(err => {
+				console.error("Error uploading CV:", err);
+				this.showToast("Something went wrong during upload!", "error");
+				return;
+			});
+		}
+
+		showCVDisplay(cvData) {
+			const uploadArea = document.getElementById('cvUploadArea');
+			const cvDisplay = document.getElementById('cvDisplay');
+			const cvImageContainer = document.getElementById('cvImageContainer');
+			const cvNonImage = document.getElementById('cvNonImage');
+			if (!this.cvUrl) {
+				uploadArea.style.display = 'block';
+				cvDisplay.classList.remove('show');
+				cvImageContainer.style.display = 'none';
+				cvNonImage.style.display = 'none';
+				return;
+			}
+			uploadArea.style.display = 'none';
+			cvDisplay.classList.add('show');
+			cvImageContainer.style.display = 'block';
+			cvNonImage.style.display = 'none';
+			document.getElementById('cvImage').src = this.cvUrl;
+			document.getElementById('cvImageName').textContent = '@Model.UserName CV';
+		}
+
+		deleteCV() {
+			const id =Number(@Model.UserId);
+			  fetch('/User/DeleteCV', {
+					method: 'POST',
+					headers: {
+						 'Content-Type': 'application/json',
+						 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+					},
+					body: JSON.stringify({ CandidateId: id })
+				})
+			.then(res => res.json())
+			.then(data => {
+				if (data.success) {
+					this.cvUrl = '';
+					this.showCVDisplay(this.currentCV.url);
+					this.showToast(data.message,'success');
+				} else {
+						this.showToast(data.message, 'error');
+					return;
+				}
+			})
+			.catch(err => {
+				console.error("Error uploading CV:", err);
+				this.showToast("Something went wrong during upload!", "error");
+				return;
+			});
+		}
+
+		formatFileSize(bytes) {
+			if (bytes === 0) return '0 Bytes';
+			const k = 1024;
+			const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+			const i = Math.floor(Math.log(bytes) / Math.log(k));
+			return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+		}
+
+		showToast(message, type = 'success') {
+			const existingToast = document.querySelector('.toast');
+			if (existingToast) {
+				existingToast.remove();
+			}
+
+			const toast = document.createElement('div');
+			toast.className = `toast ${type}`;
+			toast.textContent = message;
+
+			document.body.appendChild(toast);
+
+			setTimeout(() => {
+				toast.classList.add('show');
+			}, 100);
+
+			setTimeout(() => {
+				toast.classList.remove('show');
+				setTimeout(() => {
+					if (document.body.contains(toast)) {
+						document.body.removeChild(toast);
+					}
+				}, 300);
+			}, 4000);
+		}
+
+		setEditMode() {
+			this.isEditMode = true;
+
+			document.getElementById('firstName').readOnly = false;
+			document.getElementById('lastName').readOnly = false;
+			document.getElementById('email').readOnly = false;
+			document.getElementById('phone').readOnly = false;
+			document.getElementById('bio').readOnly = false;
+
+			document.getElementById('editBtn').style.display = 'none';
+			document.getElementById('saveBtn').style.display = 'flex';
+			document.getElementById('resetBtn').style.display = 'flex';
+			document.getElementById('cancelBtn').style.display = 'flex';
+		}
+
+		setViewMode() {
+			this.isEditMode = false;
+
+			document.getElementById('firstName').readOnly = true;
+			document.getElementById('lastName').readOnly = true;
+			document.getElementById('email').readOnly = true;
+			document.getElementById('phone').readOnly = true;
+			document.getElementById('bio').readOnly = true;
+
+			document.getElementById('editBtn').style.display = 'flex';
+			document.getElementById('saveBtn').style.display = 'none';
+			document.getElementById('resetBtn').style.display = 'none';
+			document.getElementById('cancelBtn').style.display = 'none';
+		}
+
+		cancelEdit() {
+			this.resetForm();
+			this.setViewMode();
+		}
+	}
+
+	document.addEventListener('DOMContentLoaded', () => {
+		new SettingsManager();
+	});
+
+	document.addEventListener('dragover', (e) => e.preventDefault());
+	document.addEventListener('drop', (e) => e.preventDefault());
+</script>
+@section Styles {
+	<link rel="stylesheet" href="~/css/UserInformation.css" />
+}

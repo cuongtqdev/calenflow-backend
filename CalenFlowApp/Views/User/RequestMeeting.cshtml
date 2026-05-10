@@ -1,0 +1,281 @@
+﻿@Html.AntiForgeryToken()
+@{
+	Layout = "~/Views/Shared/_LayoutSidebar.cshtml";
+
+}
+<div class="form-container">
+    <form id="requestMeetingForm">
+        <div class="form-group-grid">
+            <div class="form-group">
+                <label for="companyName">Company Name *</label>
+                <select id="companyName">
+                    <option value="" disabled selected>-- Select Company --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="positionRole">Position/Role *</label>
+                <input type="text" id="positionRole" placeholder="e.g. Senior Frontend Developer">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Preferred Schedule</h2>
+            <div class="form-group-grid">
+                <div class="form-group date-picker-container">
+                    <label for="preferredDate">Preferred Date</label>
+                    <input type="text" id="preferredDate" placeholder="yyyy-mm-dd" readonly>
+                    <i class="fas fa-calendar-alt"></i>
+                    <div id="calendar-popup" class="calendar-popup"></div>
+                </div>
+                <div class="form-group time-picker-container">
+                    <label for="preferredTime">Preferred Time</label>
+                    <select id="preferredTime">
+                        <option value="" disabled selected>-- : --</option>
+                    </select>
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Meeting Type</h2>
+            <div class="form-group-grid">
+                <div class="form-group">
+                    <label for="meetingType">Select meeting type</label>
+                    <select id="meetingType">
+                        <option>Google-Meet</option>
+                        <option>In-person</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Additional Message</h2>
+            <div class="form-group">
+                <textarea id="additionalMessage" rows="4"
+                          placeholder="Include any additional information..."></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-clear">Clear Form</button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Send Meeting Request
+            </button>
+        </div>
+    </form>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const companySelect = document.getElementById('companyName');
+        const roleInput = document.getElementById('positionRole');
+        const preferredDateInput = document.getElementById('preferredDate');
+        const preferredTimeSelect = document.getElementById('preferredTime');
+        const calendarPopup = document.getElementById('calendar-popup');
+        const form = document.getElementById('requestMeetingForm');
+        const clearFormBtn = document.querySelector('.btn-clear');
+
+        let currentDate = new Date();
+        let currentHiringList = [];
+        let currentHiringAvailables = [];
+        let selectedHiringAvailableId = null;
+
+        const showToast = (message, type) => {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.addEventListener('transitionend', () => toast.remove());
+            }, 3000);
+        };
+
+        const loadCompanies = async () => {
+            const res = await fetch('/Company/GetCompanies');
+            const companies = await res.json();
+            companies.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                companySelect.appendChild(opt);
+            });
+        };
+
+        companySelect.addEventListener('change', async () => {
+            preferredDateInput.value = '';
+            preferredTimeSelect.innerHTML = '<option value="" disabled selected>-- : --</option>';
+            currentHiringList = [];
+            currentHiringAvailables = [];
+
+            const companyId = companySelect.value;
+            const res = await fetch(`/Hiring/GetByCompany?companyId=${companyId}`);
+            currentHiringList = await res.json();
+
+            currentHiringAvailables = currentHiringList.flatMap(h => h.hiringAvailables || []);
+        });
+
+        const renderCalendar = () => {
+            calendarPopup.innerHTML = '';
+            const month = currentDate.getMonth();
+            const year = currentDate.getFullYear();
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+
+            const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+            const header = `
+                <div class="calendar-header">
+                    <button type="button" class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                    <span>${monthNames[month]} ${year}</span>
+                    <button type="button" class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>`;
+            calendarPopup.insertAdjacentHTML('beforeend', header);
+
+            const grid = document.createElement('div');
+            grid.className = 'calendar-grid';
+            dayNames.forEach(day => {
+                const el = document.createElement('div');
+                el.className = 'day-header';
+                el.textContent = day;
+                grid.appendChild(el);
+            });
+
+            for (let i=0;i<firstDay;i++) grid.innerHTML += '<div></div>';
+
+            for (let d=1; d<=lastDay; d++) {
+                const fullDate = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const isAvailable = currentHiringAvailables.some(av => av.date === fullDate);
+
+                const el = document.createElement('div');
+                el.className = `calendar-day ${isAvailable ? 'available' : 'disabled'}`;
+                el.textContent = d;
+                el.dataset.date = fullDate;
+                grid.appendChild(el);
+            }
+
+            calendarPopup.appendChild(grid);
+
+            calendarPopup.querySelector('.prev-btn').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+            calendarPopup.querySelector('.next-btn').addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+
+            document.querySelectorAll('.calendar-day.available').forEach(day => {
+                day.addEventListener('click', e => {
+                    const selectedDate = e.target.dataset.date;
+                    preferredDateInput.value = selectedDate;
+                    calendarPopup.classList.remove('show');
+                    populateTimeSlots(selectedDate);
+                });
+            });
+        };
+
+        const populateTimeSlots = (date) => {
+            preferredTimeSelect.innerHTML = '<option value="" disabled selected>-- : --</option>';
+            const slots = currentHiringAvailables.filter(av => av.date === date);
+            slots.forEach(av => {
+                const opt = document.createElement('option');
+                opt.value = av.id; 
+                console.log(av.time);
+                opt.textContent = formatTime(av.time);
+                preferredTimeSelect.appendChild(opt);
+            });
+        };
+
+        function formatTime(time24) {
+            let [hour, minute] = time24.split(':').map(Number);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            hour = hour % 12 || 12;
+            return `${hour.toString().padStart(2,'0')}:${minute.toString().padStart(2,'0')} ${ampm}`;
+        }
+
+
+        preferredDateInput.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentHiringAvailables.length === 0) {
+                showToast("Please select a company first.", "error");
+                return;
+            }
+            renderCalendar();
+            calendarPopup.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!calendarPopup.contains(e.target) && e.target !== preferredDateInput) {
+                calendarPopup.classList.remove('show');
+            }
+        });
+
+        preferredTimeSelect.addEventListener('change', () => {
+            selectedHiringAvailableId = preferredTimeSelect.value;
+        });
+
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!companySelect.value || !roleInput.value.trim() || !preferredDateInput.value || !preferredTimeSelect.value) {
+                showToast("Please fill in all required fields.", "error");
+                return;
+            }
+
+            const payload = {
+                companyId: companySelect.value,
+                positionRole: roleInput.value.trim(),
+                hiringAvailableId: selectedHiringAvailableId,
+                meetingType: document.getElementById('meetingType').value,
+                additionalMessage: document.getElementById('additionalMessage').value
+            };
+            fetch('/User/SendRequestMeeting', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({  CompanyId: payload.companyId, 
+                                        HiringAvailableId: payload.hiringAvailableId ,
+                                        MeetingType: payload.meetingType ,
+                                        PositionRole: payload.positionRole ,
+                                        AdditionalMessage: payload.additionalMessage  })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+					showToast(data.message, "success");
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .catch(err => {
+                console.error("Error updating status:", err);
+                this.showToast("Something went wrong!", "error");
+            });
+            console.log("Form submitted:", payload);
+            form.reset();
+            preferredTimeSelect.innerHTML = '<option value="" disabled selected>-- : --</option>';
+        });
+
+        clearFormBtn.addEventListener('click', () => {
+            form.reset();
+            preferredTimeSelect.innerHTML = '<option value="" disabled selected>-- : --</option>';
+        });
+
+        loadCompanies();
+    });
+</script>
+
+
+@section Styles {
+	<link rel="stylesheet" href="~/css/UserRequestMeeting.css" />
+}

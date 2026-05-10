@@ -1,0 +1,287 @@
+﻿@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">🤖 AI-Powered Features</div>
+        <h1>Revolutionize Interview Scheduling with AI</h1>
+        <p>Discover how Calendflow's advanced AI and comprehensive integrations streamline your hiring process, save time, and improve candidate experience.</p>
+        <div class="hero-buttons">
+            <button class="btn btn-outline btn-hero" onclick="watchDemo()">▶ Watch Demo</button>
+            <button class="btn btn-blue btn-hero" onclick="startTrial()">Start Free Trial</button>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">90%</div>
+                <div class="stat-label">Faster Scheduling</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">75%</div>
+                <div class="stat-label">Fewer Conflicts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">60%</div>
+                <div class="stat-label">Time Saved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">95%</div>
+                <div class="stat-label">User Satisfaction</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="section">
+    <div class="section-badge">🔗 Integrations</div>
+    <h2 class="section-title">Connect with Your Existing Tools</h2>
+    <p class="section-subtitle">Seamlessly integrate with the tools your team already uses. No workflow disruption, just enhanced productivity.</p>
+
+    <div class="integrations-grid">
+        <div class="integration-card" onclick="showIntegrationDetails('google-calendar')">
+            <div class="integration-icon">📅</div>
+            <h3>Google Calendar</h3>
+            <p>Seamless two-way sync with real-time availability</p>
+            <span class="integration-tag">Calendar</span>
+        </div>
+        <div class="integration-card" onclick="showIntegrationDetails('outlook-calendar')">
+            <div class="integration-icon">📅</div>
+            <h3>Outlook Calendar</h3>
+            <p>Native Microsoft integration with meeting creation</p>
+            <span class="integration-tag">Calendar</span>
+        </div>
+        <div class="integration-card" onclick="showIntegrationDetails('linkedin-talent')">
+            <div class="integration-icon">👥</div>
+            <h3>LinkedIn Talent Hub</h3>
+            <p>Import candidate profiles and sync hiring pipeline</p>
+            <span class="integration-tag">ATS</span>
+        </div>
+        <div class="integration-card" onclick="showIntegrationDetails('workday')">
+            <div class="integration-icon">💼</div>
+            <h3>Workday</h3>
+            <p>Enterprise HR system integration for large organizations</p>
+            <span class="integration-tag">HRIS</span>
+        </div>
+        <div class="integration-card" onclick="showIntegrationDetails('gmail-outlook')">
+            <div class="integration-icon">✉️</div>
+            <h3>Gmail & Outlook</h3>
+            <p>Automated email communications and scheduling links</p>
+            <span class="integration-tag">Communication</span>
+        </div>
+        <div class="integration-card" onclick="showIntegrationDetails('slack-teams')">
+            <div class="integration-icon">💬</div>
+            <h3>Slack & Teams</h3>
+            <p>Team notifications and collaborative scheduling</p>
+            <span class="integration-tag">Communication</span>
+        </div>
+        <div class="integration-card" onclick="showIntegrationDetails('custom-apis')">
+            <div class="integration-icon">⚙️</div>
+            <h3>Custom APIs</h3>
+            <p>RESTful APIs for custom integrations and workflows</p>
+            <span class="integration-tag">Developer</span>
+        </div>
+        <div class="integration-card" onclick="showIntegrationDetails('zapier')">
+            <div class="integration-icon">⚡</div>
+            <h3>Zapier</h3>
+            <p>Connect with 3000+ apps through automation workflows</p>
+            <span class="integration-tag">Automation</span>
+        </div>
+    </div>
+</section>
+
+
+<section class="section ai-features">
+    <div class="container">
+        <div class="section-badge">🤖 AI Technology</div>
+        <h2 class="section-title">Advanced AI That Actually Works</h2>
+        <p class="section-subtitle">Our AI doesn't just automate—it intelligently optimizes every aspect of your interview scheduling process.</p>
+
+        <div class="ai-grid">
+            <div class="ai-card">
+                <div class="ai-card-image" style="background-image: url('@Url.Content("~/images/HeroThumbnailBlog1-1733148965036.png")')"></div>
+                <div class="ai-card-content">
+                    <h3>Smart Interview Matching</h3>
+                    <p>AI analyzes candidate profiles, interviewer expertise, and scheduling preferences to suggest optimal pairings.</p>
+                    <ul class="ai-benefits">
+                        <li>90% faster matching</li>
+                        <li>Reduced bias</li>
+                        <li>Better fit quality</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ai-card">
+                <div class="ai-card-image" style="background-image: url('@Url.Content("~/images/intelligent-scheduling-assistant.png")')"></div>
+                <div class="ai-card-content">
+                    <h3>Intelligent Scheduling Assistant</h3>
+                    <p>Natural language processing understands complex scheduling requests and automatically finds suitable time slots.</p>
+                    <ul class="ai-benefits">
+                        <li>24/7 availability</li>
+                        <li>Multi-timezone support</li>
+                        <li>Conflict resolution</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ai-card">
+                <div class="ai-card-image" style="background-image: url('@Url.Content("~/images/predictive-analytics.asp-final-fc908743618a4f9093dfdd1fa6e9815a.png")')"></div>
+                <div class="ai-card-content">
+                    <h3>Predictive Analytics</h3>
+                    <p>Machine learning predicts interview outcomes, no-show probability, and optimal interview timing.</p>
+                    <ul class="ai-benefits">
+                        <li>Reduce no-shows by 75%</li>
+                        <li>Optimize success rates</li>
+                        <li>Data-driven insights</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="ai-card">
+                <div class="ai-card-image" style="background-image: url('@Url.Content("~/images/659c9a73c39d516f303a1cf8_workflows-automation.png")')"></div>
+                <div class="ai-card-content">
+                    <h3>Automated Workflow Optimization</h3>
+                    <p>AI continuously learns from your hiring patterns to suggest process improvements and efficiency gains.</p>
+                    <ul class="ai-benefits">
+                        <li>Process optimization</li>
+                        <li>Time savings</li>
+                        <li>Continuous improvement</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="section impact-section">
+    <div class="section-badge" style="margin-left: 0">📊 Proven Results</div>
+    <h2 class="section-title">Measurable Impact on Your Hiring Process</h2>
+    <p class="section-subtitle">Join thousands of companies that have transformed their hiring with Calendflow.</p>
+
+    <div class="impact-grid">
+        <div class="impact-card">
+            <div class="impact-icon">⏰</div>
+            <div class="impact-number">75%</div>
+            <div class="impact-label">Reduction in scheduling time</div>
+        </div>
+        <div class="impact-card">
+            <div class="impact-icon">👥</div>
+            <div class="impact-number">90%</div>
+            <div class="impact-label">Faster candidate matching</div>
+        </div>
+        <div class="impact-card">
+            <div class="impact-icon">📅</div>
+            <div class="impact-number">60%</div>
+            <div class="impact-label">Fewer scheduling conflicts</div>
+        </div>
+        <div class="impact-card">
+            <div class="impact-icon">⭐</div>
+            <div class="impact-number">85%</div>
+            <div class="impact-label">Improvement in candidate experience</div>
+        </div>
+    </div>
+
+    <button class="btn btn-blue btn-hero" onclick="startTrial()">🚀 Start Your Free Trial</button>
+</section>
+
+<script>
+    // Integration details
+    function showIntegrationDetails(integration) {
+        const details = {
+            'google-calendar': 'Google Calendar integration provides seamless two-way synchronization with real-time availability checking, automatic meeting creation, and conflict prevention.',
+            'outlook-calendar': 'Outlook Calendar integration offers native Microsoft ecosystem support with Exchange server compatibility and Teams meeting integration.',
+            'linkedin-talent': 'LinkedIn Talent Hub integration allows you to import candidate profiles directly and sync your entire hiring pipeline for streamlined recruitment.',
+            'workday': 'Workday integration is designed for enterprise organizations, providing deep HRIS connectivity and compliance with corporate HR policies.',
+            'gmail-outlook': 'Email integration automates communication workflows, sends scheduling links, and manages interview confirmations and reminders.',
+            'slack-teams': 'Team collaboration tools integration keeps your hiring team informed with real-time notifications and collaborative scheduling features.',
+            'custom-apis': 'RESTful APIs provide unlimited customization possibilities for developers to build custom integrations and workflows.',
+            'zapier': 'Zapier integration connects Calendflow with over 3000+ applications through automated workflows and triggers.'
+        };
+
+        alert(details[integration] || 'Integration details coming soon!');
+    }
+
+    // Demo and trial functions
+    function watchDemo() {
+        alert('Demo video sẽ được phát! Tính năng này sẽ sớm được triển khai.');
+    }
+
+    function startTrial() {
+        alert('Chào mừng bạn bắt đầu dùng thử miễn phí Calendflow! Tính năng đăng ký sẽ sớm được triển khai.');
+    }
+
+    // Smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Header scroll effect
+    window.addEventListener('scroll', function() {
+        const header = document.querySelector('.header');
+        if (window.scrollY > 100) {
+            header.style.background = 'rgba(255, 255, 255, 0.98)';
+        } else {
+            header.style.background = 'rgba(255, 255, 255, 0.95)';
+        }
+    });
+
+    // Animate statistics on scroll
+    function animateStats() {
+        const statCards = document.querySelectorAll('.stat-card, .impact-card');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const numberElement = entry.target.querySelector('.stat-number, .impact-number');
+                    if (numberElement && !numberElement.classList.contains('animated')) {
+                        numberElement.classList.add('animated');
+                        animateNumber(numberElement);
+                    }
+                }
+            });
+        });
+
+        statCards.forEach(card => observer.observe(card));
+    }
+
+    function animateNumber(element) {
+        const finalNumber = parseInt(element.textContent);
+        const duration = 2000;
+        const increment = finalNumber / (duration / 16);
+        let current = 0;
+
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= finalNumber) {
+                current = finalNumber;
+                clearInterval(timer);
+            }
+            element.textContent = Math.floor(current) + '%';
+        }, 16);
+    }
+
+    // Initialize animations
+    document.addEventListener('DOMContentLoaded', function() {
+        animateStats();
+    });
+
+    // Card hover effects
+    document.querySelectorAll('.integration-card, .ai-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) scale(1.02)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+</script>
+@section Styles {
+    <link rel="stylesheet" href="~/css/GuestFeaturePage.css" />
+}

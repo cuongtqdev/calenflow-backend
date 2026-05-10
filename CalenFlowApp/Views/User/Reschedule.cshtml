@@ -1,0 +1,508 @@
+﻿@model List<BusinessObjects.Models.Interview>
+@Html.AntiForgeryToken()
+@{
+	Layout = "~/Views/Shared/_LayoutSidebar.cshtml";
+	// Layout = null;
+}
+<div class="container">
+
+	<div class="section">
+		<div class="section-header">
+			<svg class="section-icon" viewBox="0 0 24 24" fill="none">
+				<rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" />
+				<line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2" />
+				<line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2" />
+				<line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" />
+			</svg>
+			<h2 class="section-title">Upcoming Interviews</h2>
+		</div>
+		<p class="section-description">Manage your scheduled interviews - reschedule or cancel as needed</p>
+
+		<div class="interview-list" id="upcoming-list">
+			@foreach (BusinessObjects.Models.Interview interview in Model)
+			{
+				if (interview.Status == "Active")
+				{
+					<div class="interview-card" data-interview-id="@interview.InterviewId">
+						<div class="interview-type-icon">
+							<svg viewBox="0 0 24 24" fill="none">
+								<path d="M15 10L11 14L17 20L21 4L3 11L10 14L13 21L17 16" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+							</svg>
+						</div>
+						<div class="interview-content">
+							<div class="interview-info">
+								<h3 class="interview-title">@interview.Position Interview</h3>
+								<div class="interview-company">@interview.Hiring.HiringNavigation.Company.Name</div>
+								<div class="interview-details">@interview.Date at @interview.Time</div>
+								<div class="interview-interviewer">@interview.Hiring.HiringNavigation.FirstName @interview.Hiring.HiringNavigation.LastName</div>
+							</div>
+							<div class="interview-actions">
+								<span class="status-badge status-@interview.Status">@interview.Status</span>
+								<button class="action-btn" onclick="rescheduleInterview(@interview.InterviewId)">
+									<svg viewBox="0 0 24 24" fill="none">
+										<path d="M11 4H4A2 2 0 0 0 2 6V18A2 2 0 0 0 4 20H16A2 2 0 0 0 18 18V13" stroke="currentColor" stroke-width="2" />
+										<path d="M18.5 2.5A2.12 2.12 0 0 1 21 4.5A2.12 2.12 0 0 1 18.5 7L10 15.5L6 16.5L7 12.5L15.5 4Z" stroke="currentColor" stroke-width="2" />
+									</svg>
+									Reschedule
+								</button>
+								<button class="action-btn cancel" onclick="cancelInterview(@interview.InterviewId)">
+									<svg viewBox="0 0 24 24" fill="none">
+										<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+										<line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2" />
+										<line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2" />
+									</svg>
+									Cancel
+								</button>
+							</div>
+						</div>
+					</div>
+				}
+			}
+
+			<div class="pagination" id="upcoming-pagination"></div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="section-header">
+			<svg class="section-icon" viewBox="0 0 24 24" fill="none">
+				<path d="M22 11.08V12A10 10 0 1 1 5.93 7.25" stroke="currentColor" stroke-width="2" />
+				<polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2" />
+			</svg>
+			<h2 class="section-title">Past Interviews</h2>
+		</div>
+		<p class="section-description">Your interview history</p>
+
+		<div class="interview-list" id="past-list">
+			@foreach (BusinessObjects.Models.Interview interview in Model)
+			{
+				if ( interview.Status == "Completed" )
+				{
+					<div class="interview-card" data-interview-id="@interview.InterviewId">
+						<div class="interview-type-icon phone">
+							<svg viewBox="0 0 24 24" fill="none">
+								<path d="M22 16.92V19A2 2 0 0 1 20.11 21A19.79 19.79 0 0 1 2 3.11A2 2 0 0 1 4.08 2H7.16A2 2 0 0 1 9.12 3.8L10.26 7.26A2 2 0 0 1 9.81 9.47L8.09 11.19C9.08 13.26 10.74 14.92 12.81 15.91L14.53 14.19A2 2 0 0 1 16.74 13.74L20.2 14.88A2 2 0 0 1 22 16.92Z" stroke="currentColor" stroke-width="2" />
+							</svg>
+						</div>
+						<div class="interview-content">
+							<div class="interview-info">
+								<h3 class="interview-title">@interview.Hiring.HiringNavigation.FirstName @interview.Hiring.HiringNavigation.LastName</h3>
+								<div class="interview-company">@interview.Hiring.HiringNavigation.Company.Name</div>
+								<div class="interview-details">@interview.Date at @interview.Time</div>
+								<div class="interview-details">You are @interview.Candidate.Status</div>
+							</div>
+							<div class="interview-actions">
+								<span class="status-badge status-Completed">Completed</span>
+							</div>
+						</div>
+					</div>
+				}
+			}
+		</div>
+		<div class="pagination" id="past-pagination"></div>
+	</div>
+
+	<div class="modal-overlay" id="rescheduleModal">
+		<div class="modal-container">
+			<div class="modal-container-header">
+				<h3 class="modal-container-title">Reschedule Interview</h3>
+				<button class="modal-container-close" onclick="closeModal('rescheduleModal')">&times;</button>
+			</div>
+			<div class="modal-container-content">
+				<p>Select a new date and time for your interview:</p>
+				<br>
+				<div>
+					<label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Available Slots:</label>
+					<select id="rescheduleSlot" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+						<!-- options sẽ được JS thêm vào -->
+					</select>
+				</div>
+				<br>
+				<div>
+					<label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Reason (optional):</label>
+					<textarea id="rescheduleReason" placeholder="Please provide a reason for rescheduling..."
+							  style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; min-height: 80px; resize: vertical;"></textarea>
+				</div>
+			</div>
+
+			<div class="modal-container-actions">
+				<button class="btn btn-secondary" onclick="closeModal('rescheduleModal')">Cancel</button>
+				<button class="btn btn-primary" onclick="confirmReschedule()">Reschedule Interview</button>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal-overlay" id="cancelModal">
+		<div class="modal-container">
+			<div class="modal-container-header">
+				<h3 class="modal-container-title">Cancel Interview</h3>
+				<button class="modal-container-close" onclick="closeModal('cancelModal')">&times;</button>
+			</div>
+			<div class="modal-container-content">
+				<p>Are you sure you want to cancel this interview?</p>
+				<br>
+				<div>
+					<label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Reason for cancellation:</label>
+					<textarea id="cancelReason" placeholder="Please provide a reason for cancellation..." style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; min-height: 80px; resize: vertical;" required></textarea>
+				</div>
+				<br>
+				<div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.5rem; padding: 1rem;">
+					<p style="color: #dc2626; font-size: 0.9rem;">
+						<strong>Warning:</strong> This action cannot be undone. The interviewer will be notified of the cancellation.
+					</p>
+				</div>
+			</div>
+			<div class="modal-container-actions">
+				<button class="btn btn-secondary" onclick="closeModal('cancelModal')">Keep Interview</button>
+				<button class="btn btn-danger" onclick="confirmCancel()">Cancel Interview</button>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="toast" id="toast"></div>
+
+	<script>
+		class InterviewManager {
+			constructor() {
+				this.currentInterviewId = null;
+				this.interviews = {
+					@foreach (var i in Model)
+					{
+						<text>
+							@i.InterviewId: {
+								title: "@i.Position Interview",
+								company: "@i.Hiring.HiringNavigation.Company.Name",
+								date: "@i.Date.ToString("yyyy-MM-dd")",
+								time: "@i.Time.ToString(@"hh\:mm")",
+								interviewer: "@i.Hiring.HiringNavigation.FirstName @i.Hiring.HiringNavigation.LastName",
+								status: "@i.Status",
+								hiringId: @i.HiringId
+							},
+						</text>
+					}
+				};
+				this.hiringAvailabilities = {
+					44: [
+						{ id: 201, date: '2025-09-25', time: '09:00' },
+						{ id: 202, date: '2025-09-25', time: '14:00' },
+						{ id: 203, date: '2025-09-26', time: '10:30' }
+					],
+					43: [
+						{ id: 301, date: '2025-09-27', time: '11:00' },
+						{ id: 302, date: '2025-09-28', time: '15:00' }
+					]
+				};
+				this.init();
+			}
+
+			init() {
+				this.loadDataHiringAvailabilities();
+				document.addEventListener('click', (e) => {
+					if (e.target.classList.contains('modal-overlay')) {
+						this.closeModal(e.target.id);
+					}
+				});
+				document.addEventListener('keydown', (e) => {
+					if (e.key === 'Escape') {
+						this.closeAllModals();
+					}
+				});
+			}
+			loadDataHiringAvailabilities() {
+				const hiringIds = Object.values(this.interviews).map(interview => interview.hiringId);
+				const uniqueHiringIds = [...new Set(hiringIds)];
+				this.hiringAvailabilities = {};
+
+				uniqueHiringIds.forEach(hiringId => {
+					fetch(`/Hiring/GetHiringAvailabilities?hiringId=${hiringId}`)
+					.then(res => res.json())
+					.then(data => {
+						this.hiringAvailabilities[hiringId] = data;
+						console.log("Loaded availabilities for", hiringId, data);
+					})
+					.catch(err => console.error("Error:", err));
+				});
+			}
+			rescheduleInterview(interviewId) {
+				this.currentInterviewId = interviewId;
+				const interview = this.interviews[interviewId];
+				if (interview) {
+					const slotSelect = document.getElementById('rescheduleSlot');
+					slotSelect.innerHTML = ''; // clear cũ
+
+					const slots = this.hiringAvailabilities[interview.hiringId] || [];
+					if (slots.length === 0) {
+						slotSelect.innerHTML = `<option disabled>No available slots</option>`;
+					} else {
+						slots.forEach(s => {
+							const opt = document.createElement('option');
+							opt.value = `${s.date}|${s.time}`;
+							opt.textContent = `${this.formatDate(s.date)} at ${this.formatTime(s.time)}`;
+							slotSelect.appendChild(opt);
+						});
+					}
+
+					document.getElementById('rescheduleReason').value = '';
+					this.showModal('rescheduleModal');
+				}
+			}
+			convertToDotNetDateTime(dateString) {
+				// dateString: "2025-09-24 10:00 AM"
+				const [datePart, timePart, modifier] = dateString.split(" ");
+				let [year, month, day] = datePart.split("-");
+				let [hours, minutes] = timePart.split(":");
+
+				hours = parseInt(hours, 10);
+
+				if (modifier === "PM" && hours < 12) {
+					hours += 12;
+				}
+				if (modifier === "AM" && hours === 12) {
+					hours = 0;
+				}
+
+				return `${year}-${month}-${day}T${String(hours).padStart(2,"0")}:${minutes}:00`;
+			}
+			cancelInterview(interviewId) {
+				this.currentInterviewId = interviewId;
+				document.getElementById('cancelReason').value = '';
+				this.showModal('cancelModal');
+			}
+			confirmReschedule() {
+				const slotValue = document.getElementById('rescheduleSlot').value;
+				const reason = document.getElementById('rescheduleReason').value;
+
+				if (!slotValue) {
+					this.showToast('Please select a slot', 'error');
+					return;
+				}
+				const id = this.currentInterviewId;
+				const [newDate, newTime] = slotValue.split('|');
+				const interview = this.interviews[this.currentInterviewId];
+				if (interview) {
+					interview.date = newDate;
+					interview.time = newTime;
+					const dateTime = this.convertToDotNetDateTime(`${newDate} ${newTime}`);
+					console.log('id' , id);
+					console.log(`Interview ${this.currentInterviewId} rescheduled:`, { newDate, newTime, reason });
+					fetch('/User/Reschedule', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+						},
+						body: JSON.stringify({ HiringId: interview.hiringId, NewDate: dateTime, Reason: reason })
+					})
+					.then(response => response.json())
+					.then(data => {
+						if (data.success) {
+							this.updateInterviewCard(this.currentInterviewId);
+							this.closeModal('rescheduleModal');
+							this.showToast(`Interview rescheduled successfully for ${this.formatDate(newDate)} at ${this.formatTime(newTime)}`, 'success');
+						} else {
+						this.showToast(data.message, 'error');
+						}
+					})
+					.catch(err => {
+						console.error("Error updating status:", err);
+						this.showToast("Something went wrong!", "error");
+					});
+				}
+			}
+
+			confirmCancel() {
+				const reason = document.getElementById('cancelReason').value.trim();
+
+				if (!reason) {
+					this.showToast('Please provide a reason for cancellation', 'error');
+					return;
+				}
+
+				const interview = this.interviews[this.currentInterviewId];
+				if (interview) {
+					const interviewCard = document.querySelector(`[data-interview-id="${this.currentInterviewId}"]`);
+					if (interviewCard) {
+						interviewCard.style.transition = 'all 0.3s ease';
+						interviewCard.style.opacity = '0';
+						interviewCard.style.transform = 'translateX(-100%)';
+
+						setTimeout(() => {
+							interviewCard.remove();
+						}, 300);
+					}
+
+					delete this.interviews[this.currentInterviewId];
+
+					this.closeModal('cancelModal');
+					this.showToast(`Interview cancelled successfully. The interviewer has been notified.`, 'success');
+
+					console.log(`Interview ${this.currentInterviewId} cancelled:`, {
+						reason,
+						interview: interview.title
+					});
+				}
+			}
+
+			updateInterviewCard(interviewId) {
+				const interview = this.interviews[interviewId];
+				const card = document.querySelector(`[data-interview-id="${interviewId}"]`);
+
+				if (card && interview) {
+					const detailsElement = card.querySelector('.interview-details');
+					const formattedDate = this.formatDate(interview.date);
+					const formattedTime = this.formatTime(interview.time);
+
+					detailsElement.textContent = `${formattedDate} at ${formattedTime} • ${interview.duration}`;
+
+									card.style.background = '#f0fdf4';
+					setTimeout(() => {
+						card.style.background = 'white';
+					}, 2000);
+				}
+			}
+
+			showModal(modalId) {
+				const modal = document.getElementById(modalId);
+				modal.classList.add('show');
+				document.body.style.overflow = 'hidden';
+
+				const firstInput = modal.querySelector('input, textarea');
+				if (firstInput) {
+					setTimeout(() => firstInput.focus(), 100);
+				}
+			}
+
+			closeModal(modalId) {
+				const modal = document.getElementById(modalId);
+				modal.classList.remove('show');
+				document.body.style.overflow = '';
+				this.currentInterviewId = null;
+			}
+
+			closeAllModals() {
+				document.querySelectorAll('.modal-overlay').forEach(modal => {
+					modal.classList.remove('show');
+				});
+				document.body.style.overflow = '';
+				this.currentInterviewId = null;
+			}
+
+			showToast(message, type = 'success') {
+				const toast = document.getElementById('toast');
+				toast.textContent = message;
+				toast.className = `toast ${type}`;
+				toast.classList.add('show');
+
+				setTimeout(() => {
+					toast.classList.remove('show');
+				}, 4000);
+			}
+
+			formatDate(dateString) {
+				const date = new Date(dateString);
+				const options = {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				};
+				return date.toLocaleDateString('en-US', options);
+			}
+
+			formatTime(timeString) {
+				const [hours, minutes] = timeString.split(':');
+				const date = new Date();
+				date.setHours(parseInt(hours), parseInt(minutes));
+				return date.toLocaleTimeString('en-US', {
+					hour: 'numeric',
+					minute: '2-digit',
+					hour12: true
+				});
+			}
+
+					getInterview(id) {
+				return this.interviews[id];
+			}
+
+			getAllInterviews() {
+				return this.interviews;
+			}
+
+			addInterview(interview) {
+				const id = Date.now().toString();
+				this.interviews[id] = interview;
+				return id;
+			}
+		}
+
+		function rescheduleInterview(interviewId) {
+			console.log('reschedule interview');
+			if (window.interviewManager) {
+				window.interviewManager.rescheduleInterview(interviewId);
+			}
+		}
+
+		function cancelInterview(interviewId) {
+			if (window.interviewManager) {
+				window.interviewManager.cancelInterview(interviewId);
+			}
+		}
+
+		function closeModal(modalId) {
+			if (window.interviewManager) {
+				window.interviewManager.closeModal(modalId);
+			}
+		}
+
+		function confirmReschedule() {
+			if (window.interviewManager) {
+				window.interviewManager.confirmReschedule();
+			}
+		}
+
+		function confirmCancel() {
+			if (window.interviewManager) {
+				window.interviewManager.confirmCancel();
+			}
+		}
+		function setupPagination(sectionId, paginationId, itemsPerPage = 3) {
+			const list = document.getElementById(sectionId);
+			const pagination = document.getElementById(paginationId);
+			const cards = Array.from(list.querySelectorAll('.interview-card'));
+			const totalPages = Math.ceil(cards.length / itemsPerPage);
+			let currentPage = 1;
+
+			function renderPage(page) {
+				cards.forEach((card, index) => {
+					card.style.display = (index >= (page - 1) * itemsPerPage && index < page * itemsPerPage)
+						? "flex"
+						: "none";
+				});
+
+				// update pagination buttons
+				pagination.innerHTML = "";
+				for (let i = 1; i <= totalPages; i++) {
+					const btn = document.createElement("button");
+					btn.textContent = i;
+					btn.className = "page-btn " + (i === page ? "active" : "");
+					btn.onclick = () => {
+						currentPage = i;
+						renderPage(currentPage);
+					};
+					pagination.appendChild(btn);
+				}
+			}
+
+			if (cards.length > 0) renderPage(currentPage);
+		}
+
+		document.addEventListener('DOMContentLoaded', () => {
+			window.interviewManager = new InterviewManager();
+			setupPagination("upcoming-list", "upcoming-pagination", 3);
+			setupPagination("past-list", "past-pagination", 3);
+		});
+	</script>
+	@section Styles {
+		<link rel="stylesheet" href="~/css/UserReschedule.css" />
+	}

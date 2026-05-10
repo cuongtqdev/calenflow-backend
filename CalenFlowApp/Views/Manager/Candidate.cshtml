@@ -1,0 +1,700 @@
+﻿@model List<BusinessObjects.Models.Interview>
+@Html.AntiForgeryToken()
+@{
+    Layout = "~/Views/Shared/_LayoutSidebarManager.cshtml";
+}
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total</span>
+                    <svg class="stat-icon total" viewBox="0 0 24 24" fill="none">
+                        <path d="M17 21V19A4 4 0 0 0 13 15H5A4 4 0 0 0 1 19V21" stroke="currentColor" stroke-width="2" />
+                        <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" />
+                        <path d="M23 21V19A4 4 0 0 0 16.5 15.91" stroke="currentColor" stroke-width="2" />
+                        <path d="M16 3.13A4 4 0 0 1 16 10.87" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                </div>
+                <div class="stat-number" id="totalCount">15</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Active</span>
+                    <svg class="stat-icon active" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                        <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                </div>
+                <div class="stat-number" id="activeCount">10</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Hired</span>
+                    <svg class="stat-icon hired" viewBox="0 0 24 24" fill="none">
+                        <path d="M22 11.08V12A10 10 0 1 1 5.93 7.01" stroke="currentColor" stroke-width="2" />
+                        <polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                </div>
+                <div class="stat-number" id="hiredCount">2</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Rejected</span>
+                    <svg class="stat-icon rejected" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                        <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2" />
+                        <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                </div>
+                <div class="stat-number" id="rejectedCount">1</div>
+            </div>
+        </div>
+
+        <div class="management-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div>
+                        <h2>Candidates Management</h2>
+                        <p>Manage candidate profiles and interview schedules</p>
+                    </div>
+                </div>
+                <button class="add-candidate-btn" onclick="openAddCandidateModal()">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" />
+                        <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    Add Candidate
+                </button>
+            </div>
+
+            <div class="search-filters">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+                        <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    <input type="text" class="search-input" placeholder="Search candidates..." id="searchInput" oninput="searchCandidates()">
+                </div>
+                <select class="filter-select" id="statusFilter" onchange="filterCandidates()">
+                    <option value="">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Pending">Pending Approval</option>
+                    <option value="Completed">Completed</option>
+                    <option value="hired">Hired</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <div class="results-info" id="resultsInfo">8 of 8 candidates</div>
+            </div>
+
+            <div class="candidates-list" id="candidatesList">
+            </div>
+
+            <div class="pagination" id="pagination">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay-cv" id="cvModal">
+    <div class="modal-cv cv-modal">
+        <div class="modal-header-cv">
+            <h2 class="modal-title-cv" id="cvModalTitle">CV Preview</h2>
+            <button class="modal-close-cv" onclick="closeCVModal()">&times;</button>
+            </div>
+        <div class="modal-content-cv">
+            <img class="cv-image" id="cvImage" alt="CV Preview">
+        </div>
+        </div>
+    </div>
+
+<div class="modal-overlay-cv" id="rescheduleModal">
+    <div class="modal-cv">
+        <div class="modal-header-cv">
+            <h2 class="modal-title-cv">Reschedule Interview</h2>
+            <button class="modal-close-cv" onclick="closeRescheduleModal()">&times;</button>
+            </div>
+        <div class="modal-content-cv">
+                <form id="rescheduleForm">
+                    <div class="form-group">
+                        <label class="form-label">Reason for Rescheduling *</label>
+                        <textarea class="form-input form-textarea" id="rescheduleReason" placeholder="Please provide a reason for rescheduling..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Interview Date *</label>
+                        <input type="date" class="form-input" id="newInterviewDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Interview Time *</label>
+                        <input type="time" class="form-input" id="newInterviewTime" required>
+                    </div>
+                </form>
+            </div>
+        <div class="modal-footer-cv">
+                <button class="btn btn-secondary" onclick="closeRescheduleModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitReschedule()">Reschedule Interview</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    class CandidateManager {
+        constructor() {
+            this.currentPage = 1;
+            this.itemsPerPage = 5;
+            this.currentFilter = '';
+            this.currentSearch = '';
+            this.currentRescheduleId = null;
+            this.candidates = [
+                @foreach (var interview in Model)
+                {
+                    <text>
+                       {
+                        id: @interview.CandidateId,
+                        name: "@interview.Candidate.CandidateNavigation.FirstName " + "@interview.Candidate.CandidateNavigation.LastName",
+                        position: "@interview.Position",
+                        company: "@interview.Hiring.HiringNavigation.Company.Name",
+                        email: "@interview.Candidate.CandidateNavigation.Email",
+                        phone: "@interview.Candidate.CandidateNavigation.Phone",
+                        status: "@interview.Candidate.Status",
+                        cvImage: "@Url.Content("~"+interview.Candidate.UrlCv)",
+                        interviews: [
+                            {
+                               idInterview: @interview.InterviewId,
+                               date: "@interview.Date.ToString("yyyy-MM-dd") at @interview.Time.ToString("hh:mm tt")",
+                               type: "@interview.Type",
+                               status: "@interview.Status",
+                               meetLink: "@interview.LinkMeet"
+                            }
+                        ]
+                        },
+                   </text>
+                }
+            ];
+            this.init();
+        }
+        init() {
+            this.updateStats();
+            this.renderCandidates();
+            this.renderPagination();
+            this.updateResultsInfo();
+        }
+
+        updateStats() {
+            const stats = this.candidates.reduce((acc, candidate) => {
+                acc.total++;
+                if (candidate.status === 'Active' || candidate.status === 'scheduled' || candidate.status === 'Pending') acc.active++;
+                if (candidate.status === 'hired') acc.hired++;
+                if (candidate.status === 'rejected') acc.rejected++;
+                return acc;
+            }, { total: 0, active: 0, hired: 0, rejected: 0 });
+
+            document.getElementById('totalCount').textContent = stats.total;
+            document.getElementById('activeCount').textContent = stats.active;
+            document.getElementById('hiredCount').textContent = stats.hired;
+            document.getElementById('rejectedCount').textContent = stats.rejected;
+        }
+
+        getFilteredCandidates() {
+            return this.candidates.filter(candidate => {
+                const matchesSearch = !this.currentSearch ||
+                    candidate.name.toLowerCase().includes(this.currentSearch.toLowerCase()) ||
+                    candidate.position.toLowerCase().includes(this.currentSearch.toLowerCase()) ||
+                    candidate.company.toLowerCase().includes(this.currentSearch.toLowerCase());
+
+                const matchesFilter = !this.currentFilter || candidate.status === this.currentFilter 
+                                                          || this.currentFilter === 'Completed' && candidate.interviews.some(interview => interview.status === 'Completed');;
+                return matchesSearch && matchesFilter;
+            });
+        }
+
+        renderCandidates() {
+            const filteredCandidates = this.getFilteredCandidates();
+            const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+            const endIndex = startIndex + this.itemsPerPage;
+            const currentPageCandidates = filteredCandidates.slice(startIndex, endIndex);
+
+            const candidatesList = document.getElementById('candidatesList');
+            candidatesList.innerHTML = currentPageCandidates.map(candidate => this.renderCandidateCard(candidate)).join('');
+        }
+
+        renderCandidateCard(candidate) {
+            const initials = candidate.name.split(' ').map(n => n[0]).join('');
+            const hasCompletedInterview = candidate.interviews.some(interview => interview.status === 'Pending');
+            const haventCompleteInterview = !hasCompletedInterview && candidate.interviews.some(interview => interview.status === 'Active');
+            return `
+                <div class="candidate-card">
+                    <div class="candidate-header">
+                        <div class="candidate-avatar">${initials}</div>
+                        <div class="candidate-info">
+                            <div class="candidate-name">${candidate.name}</div>
+                            <div class="candidate-position">${candidate.position}</div>
+                            <div class="candidate-company">${candidate.company}</div>
+                        </div>
+                        <div class="candidate-status">
+                            ${
+                                haventCompleteInterview ? `
+                                   <span class="status-badge Active">Active</span>
+                                ` : `<span class="status-badge ${candidate.status}">${this.getStatusLabel(candidate.status)}</span>`
+                            }
+                        </div>
+                    </div>
+
+                    <div class="candidate-content">
+                        <div class="cv-section">
+                            <div class="cv-preview" onclick="openCVModal('${candidate.name}', '${candidate.cvImage}')">
+                                <img src="${candidate.cvImage}" alt="${candidate.name} CV" onerror="this.parentElement.innerHTML='<div class=\\'cv-placeholder\\'><svg viewBox=\\'0 0 24 24\\' fill=\\'none\\'><path d=\\'M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8Z\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'/><polyline points=\\'14,2 14,8 20,8\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'/></svg><span>CV Document</span></div>'">
+                            </div>
+                            <div class="cv-label">Click to view CV</div>
+                        </div>
+
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
+                                    <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                ${candidate.email}
+                            </div>
+                            <div class="contact-item">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M22 16.92V19A2 2 0 0 1 20.11 21A19.79 19.79 0 0 1 2 3.11A2 2 0 0 1 4.08 2H7.16A2 2 0 0 1 9.12 3.8L10.26 7.26A2 2 0 0 1 9.81 9.47L8.09 11.19C9.08 13.26 10.74 14.92 12.81 15.91L14.53 14.19A2 2 0 0 1 16.74 13.74L20.2 14.88A2 2 0 0 1 22 16.92Z" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                ${candidate.phone}
+                            </div>
+
+                            ${candidate.interviews.length > 0 ? `
+                                <div class="interview-schedule">
+                                    <div class="schedule-title">Interview Schedule</div>
+                                    ${candidate.interviews.map(interview => `
+                                        <div class="schedule-item">
+                                            <svg class="schedule-icon ${interview.type === 'In-person' ? 'In-person' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                ${interview.type === 'Google-Meet' ?
+                                                    '<path d="M23 7L16 12L23 17V7Z" stroke="currentColor" stroke-width="2"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>' :
+                                                    '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />'
+                                                }
+                                            </svg>
+                                            <div class="schedule-details">
+                                                <div class="schedule-date">${interview.date}</div>
+                                                <div class="schedule-type">${interview.type === 'Google-Meet' ? 'Google Meet' : 'In Person'}</div>
+                                                ${interview.type === 'Google-Meet' && interview.meetLink ? `
+                                                    <div class="schedule-actions">
+                                                        <a href="${interview.meetLink}" target="_blank" class="action-btn join-meet">
+                                                            <svg viewBox="0 0 24 24" fill="none">
+                                                                <path d="M23 7L16 12L23 17V7Z" stroke="currentColor" stroke-width="2"/>
+                                                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                                                            </svg>
+                                                            Join Meet
+                                                        </a>
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                            <span class="schedule-status ${interview.status}">${interview.status}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="candidate-actions">
+
+                            ${hasCompletedInterview && candidate.status === 'Pending' ? `
+                                <button class="action-btn hired" onclick="updateCandidateStatus(${candidate.id}, 'hired')">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M22 11.08V12A10 10 0 1 1 5.93 7.01" stroke="currentColor" stroke-width="2"/>
+                                        <polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    Hire
+                                </button>
+                                <button class="action-btn rejected" onclick="updateCandidateStatus(${candidate.id}, 'rejected')">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                        <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/>
+                                        <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                    Reject
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        getStatusLabel(status) {
+            const labels = {
+                'active': 'Active',
+                'Pending': 'Pending Approval',
+                'scheduled': 'Interview Scheduled',
+                'Completed': 'Interview Completed',
+                'hired': 'Hired',
+                'rejected': 'Rejected'
+            };
+            return labels[status] || status;
+        }
+
+        renderPagination() {
+            const filteredCandidates = this.getFilteredCandidates();
+            const totalPages = Math.ceil(filteredCandidates.length / this.itemsPerPage);
+
+            if (totalPages <= 1) {
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('pagination').style.display = 'flex';
+
+            const startItem = (this.currentPage - 1) * this.itemsPerPage + 1;
+            const endItem = Math.min(this.currentPage * this.itemsPerPage, filteredCandidates.length);
+
+            const pages = [];
+            for (let i = 1; i <= totalPages; i++) {
+                pages.push(i);
+            }
+
+            document.getElementById('pagination').innerHTML = `
+                <div class="pagination-info">
+                    Showing ${startItem}-${endItem} of ${filteredCandidates.length} candidates
+                </div>
+
+                <div class="pagination-controls">
+                    <button class="pagination-btn"
+                            onclick="changePage(${this.currentPage - 1})"
+                            ${this.currentPage === 1 ? 'disabled' : ''}>
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <polyline points="15,18 9,12 15,6" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+
+                    ${pages.map(page => `
+                        <button class="pagination-btn ${page === this.currentPage ? 'active' : ''}"
+                                onclick="changePage(${page})">
+                            ${page}
+                        </button>
+                    `).join('')}
+
+                    <button class="pagination-btn"
+                            onclick="changePage(${this.currentPage + 1})"
+                            ${this.currentPage === totalPages ? 'disabled' : ''}>
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <polyline points="9,18 15,12 9,6" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+        }
+
+        updateResultsInfo() {
+            const filteredCandidates = this.getFilteredCandidates();
+            document.getElementById('resultsInfo').textContent =
+                `${filteredCandidates.length} of ${this.candidates.length} candidates`;
+        }
+
+        changePage(page) {
+            const filteredCandidates = this.getFilteredCandidates();
+            const totalPages = Math.ceil(filteredCandidates.length / this.itemsPerPage);
+
+            if (page >= 1 && page <= totalPages) {
+                this.currentPage = page;
+                this.renderCandidates();
+                this.renderPagination();
+            }
+        }
+
+        searchCandidates() {
+            this.currentSearch = document.getElementById('searchInput').value;
+            this.currentPage = 1;
+            this.renderCandidates();
+            this.renderPagination();
+            this.updateResultsInfo();
+        }
+
+        filterCandidates() {
+            this.currentFilter = document.getElementById('statusFilter').value;
+            this.currentPage = 1;
+            this.renderCandidates();
+            this.renderPagination();
+            this.updateResultsInfo();
+        }
+
+        updateCandidateStatus(candidateId, newStatus) {
+            fetch('/Manager/UpdateCandidateStatus', {
+                    method: 'POST',
+                    headers: {
+                         'Content-Type': 'application/json',
+                         'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ candidateId: Number(candidateId), newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cập nhật UI mượt mà
+                    const candidate = this.candidates.find(c => c.id === candidateId);
+                    if (candidate) {
+                        candidate.status = newStatus;
+                        this.updateStats();
+                        this.renderCandidates();
+                        this.updateResultsInfo();
+                        this.showToast(data.message, 'success');
+                    }
+                } else {
+                this.showToast(data.message, 'error');
+                }
+            })
+            .catch(err => {
+                console.error("Error updating status:", err);
+                this.showToast("Something went wrong!", "error");
+            });
+        }
+
+        openRescheduleModal(candidateId) {
+            this.currentRescheduleId = candidateId;
+            const modal = document.getElementById('rescheduleModal');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('newInterviewDate').min = today;
+        }
+
+        closeRescheduleModal() {
+            const modal = document.getElementById('rescheduleModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+
+            document.getElementById('rescheduleForm').reset();
+            this.currentRescheduleId = null;
+        }
+
+        submitReschedule() {
+            const reason = document.getElementById('rescheduleReason').value;
+            const newDate = document.getElementById('newInterviewDate').value;
+            const newTime = document.getElementById('newInterviewTime').value;
+
+            if (!reason || !newDate || !newTime) {
+                this.showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            const candidate = this.candidates.find(c => c.id === this.currentRescheduleId);
+            if (candidate) {
+                const formattedDate = new Date(newDate).toLocaleDateString('en-US', {
+                    month: 'numeric',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                const formattedTime = new Date(`2000-01-01T${newTime}`).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                const newDateTime = `${formattedDate} at ${formattedTime}`;
+
+                if (candidate.interviews.length > 0) {
+                    candidate.interviews[0].date = newDateTime;
+                    candidate.status = 'scheduled';
+                } else {
+                    candidate.requestedDate = newDateTime;
+                }
+
+                this.updateStats();
+                this.renderCandidates();
+                this.closeRescheduleModal();
+
+                this.showToast('Interview rescheduled successfully!', 'success');
+            }
+        }
+
+        showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#22c55e' : '#ef4444'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                font-size: 0.9rem;
+                z-index: 10000;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+            `;
+
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }  {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        approveSchedule(candidateId) {
+            const candidate = this.candidates.find(c => c.id === candidateId);
+            if (candidate) {
+                candidate.interviews = [{
+                    date: candidate.requestedDate,
+                    type: 'Google-Meet',
+                    status: 'scheduled',
+                    duration: '60min',
+                    meetLink: `https://meet.google.com/${Math.random().toString(36).substr(2, 9)}`
+                }];
+                candidate.status = 'scheduled';
+                delete candidate.requestedDate;
+
+                this.updateStats();
+                this.renderCandidates();
+                this.updateResultsInfo();
+
+                this.showToast('Interview schedule approved successfully!', 'success');
+            }
+        }
+
+        rejectSchedule(candidateId) {
+            const candidate = this.candidates.find(c => c.id === candidateId);
+            if (candidate) {
+                candidate.status = 'rejected';
+                delete candidate.requestedDate;
+
+                this.updateStats();
+                this.renderCandidates();
+                this.updateResultsInfo();
+
+                this.showToast('Interview request rejected', 'error');
+            }
+        }
+
+        isRequestDateFuture(requestedDate) {
+            if (!requestedDate) {
+                console.log('null');
+                return false;
+            }
+            const dateTimeStr = requestedDate.replace(' at ', ' ');
+            const requestDate = new Date(dateTimeStr);
+            const now = new Date();
+            return requestDate > now;
+        }
+    }
+
+    function changePage(page) {
+        if (window.candidateManager) {
+            window.candidateManager.changePage(page);
+        }
+    }
+
+    function searchCandidates() {
+        if (window.candidateManager) {
+            window.candidateManager.searchCandidates();
+        }
+    }
+
+    function filterCandidates() {
+        if (window.candidateManager) {
+            window.candidateManager.filterCandidates();
+        }
+    }
+
+    function updateCandidateStatus(candidateId, status) {
+        if (window.candidateManager) {
+            window.candidateManager.updateCandidateStatus(candidateId, status);
+        }
+    }
+
+    function openRescheduleModal(candidateId) {
+        if (window.candidateManager) {
+            window.candidateManager.openRescheduleModal(candidateId);
+        }
+    }
+
+    function closeRescheduleModal() {
+        if (window.candidateManager) {
+            window.candidateManager.closeRescheduleModal();
+        }
+    }
+
+    function submitReschedule() {
+        if (window.candidateManager) {
+            window.candidateManager.submitReschedule();
+        }
+    }
+
+    function approveSchedule(candidateId) {
+        if (window.candidateManager) {
+            window.candidateManager.approveSchedule(candidateId);
+        }
+    }
+
+    function rejectSchedule(candidateId) {
+        if (window.candidateManager) {
+            window.candidateManager.rejectSchedule(candidateId);
+        }
+    }
+
+    function openCVModal(candidateName, cvImage) {
+        const modal = document.getElementById('cvModal');
+        const modalTitle = document.getElementById('cvModalTitle');
+        const cvImageEl = document.getElementById('cvImage');
+
+        modalTitle.textContent = `${candidateName} - CV Preview`;
+        cvImageEl.src = cvImage;
+        cvImageEl.alt = `${candidateName} CV`;
+
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCVModal() {
+        const modal = document.getElementById('cvModal');
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    function openAddCandidateModal() {
+        console.log('Opening add candidate modal...');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        window.candidateManager = new CandidateManager();
+
+        document.getElementById('cvModal').addEventListener('click', (e) => {
+            if (e.target.id === 'cvModal') {
+                closeCVModal();
+            }
+        });
+
+        document.getElementById('rescheduleModal').addEventListener('click', (e) => {
+            if (e.target.id === 'rescheduleModal') {
+                closeRescheduleModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCVModal();
+                closeRescheduleModal();
+            }
+        });
+    });
+</script>
+@section Styles {
+    <link rel="stylesheet" href="~/css/ManagerCandidate.css" />
+}

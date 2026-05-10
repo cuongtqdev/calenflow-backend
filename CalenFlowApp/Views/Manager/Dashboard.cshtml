@@ -1,0 +1,313 @@
+﻿@using System.Text.Json
+@Html.AntiForgeryToken()
+@model List<BusinessObjects.Models.Interview>
+@{
+	Layout = "~/Views/Shared/_LayoutSidebarManager.cshtml";
+}
+
+<div class="main-container">
+	<div class="stats-grid">
+		<div class="stat-card">
+			<div class="stat-header">
+				<span class="stat-title">Today's Interviews</span>
+				<i class="fas fa-calendar-day stat-icon"></i>
+			</div>
+			<div class="stat-number" id="number-today-interview">3</div>
+			@* <div class="stat-description">+2 from yesterday</div> *@
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-header">
+				<span class="stat-title">Active Candidates</span>
+				<i class="fas fa-users stat-icon"></i>
+			</div>
+			<div class="stat-number" id="number-active-interview">24</div>
+			@* <div class="stat-description">+3 this week</div> *@
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-header">
+				<span class="stat-title">Pending</span>
+				<i class="fas fa-calendar-times stat-icon"></i>
+			</div>
+			<div class="stat-number" id="number-pending-interview">1</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-header">
+				<span class="stat-title">Completion Rate</span>
+				<i class="fas fa-check-circle stat-icon"></i>
+			</div>
+			<div class="stat-number" id="number-complete-rate">95%</div>
+			@* <div class="stat-description">This week</div> *@
+		</div>
+	</div>
+
+	<div class="interviews-section">
+		<div class="section-header">
+			<h2 class="section-title">Today's Interviews</h2>
+			<span class="section-subtitle">Scheduled interviews for today</span>
+		</div>
+		<div id="interviewList" class="interview-list">
+			<!-- Interviews will be rendered by JavaScript -->
+		</div>
+		<div id="pagination" class="pagination-container">
+			<!-- Pagination buttons will be rendered by JavaScript -->
+		</div>
+	</div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		   let todayInterviews = [
+	@foreach (var interview in Model)
+	{
+		<text>
+							  {
+								id: @interview.InterviewId,
+								candidateName: "@interview.Candidate.CandidateNavigation.FirstName" + " @interview.Candidate.CandidateNavigation.LastName",
+								role: "@interview.Position",
+								date: "@interview.Date.ToString("yyyy-MM-dd")",
+								time: "@interview.Time.ToString("hh:mm tt")",
+								status: "@interview.Status",
+								candidateid:  @interview.CandidateId,
+								candidateStatus:"@interview.Candidate.Status"
+							   },
+		</text>
+	}
+	];
+		const interviewListEl = document.getElementById('interviewList');
+		const paginationEl = document.getElementById('pagination');
+		const toastContainer = document.getElementById('toast-container');
+
+		let currentPage = 1;
+		const itemsPerPage = 3;
+
+
+		const todayInterview = document.getElementById('number-today-interview');
+		todayInterview.textContent = todayInterviews.length;
+
+		const activeInterview = document.getElementById('number-active-interview');
+		const active = todayInterviews.filter(interview => interview.status === 'Active').length;
+		activeInterview.textContent = active;
+
+		const pendingInterview = document.getElementById('number-pending-interview');
+		const pending = todayInterviews.filter(interview => interview.status === 'Pending').length;
+		pendingInterview.textContent = pending;
+
+		const completeRate = document.getElementById('number-complete-rate');
+		const complete = 100 - ( ( active / todayInterviews.length ) * 100 );
+		if ( todayInterviews.length === 0 ) {
+			completeRate.textContent = '0%';
+		} else {
+			completeRate.textContent = complete.toFixed(0)+'%';
+		}
+
+		const showToast = (message, type) => {
+			const toast = document.createElement('div');
+			toast.className = `toast ${type}`;
+
+			const icon = document.createElement('i');
+			icon.className = `toast-icon fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}`;
+
+			const text = document.createElement('span');
+			text.textContent = message;
+
+			toast.appendChild(icon);
+			toast.appendChild(text);
+
+			toastContainer.appendChild(toast);
+
+			setTimeout(() => {
+				toast.classList.add('show');
+			}, 10);
+
+			setTimeout(() => {
+				toast.classList.remove('show');
+				toast.addEventListener('transitionend', () => {
+					toast.remove();
+				});
+			}, 3000);
+		};
+		window.reviewLater = function(candidateId) {
+			const interviewId = () => {
+					const interview = todayInterviews.find(item => item.candidateid === candidateId);
+					return interview ? interview.id : null;
+			};
+			if (interviewId) {
+				const cardElement = document.querySelector(`.interview-card[data-id='${interviewId()}']`);
+				if (cardElement) {
+					// cardElement.classList.add('fade-out');
+					cardElement.addEventListener('transitionend', () => {
+					// cardElement.remove();
+					todayInterviews = todayInterviews.filter(item => item.candidateid !== candidateId);
+					showToast('Review later successfully', 'success');
+					renderInterviews();
+					});
+				}
+			}
+		}
+		 window.updateCandidateStatus = function(candidateId, newStatus) {
+			  fetch('/Manager/UpdateCandidateStatus', {
+					 method: 'POST',
+					 headers: {
+						  'Content-Type': 'application/json',
+						  'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+					 },
+					 body: JSON.stringify({ candidateId: Number(candidateId), newStatus })
+				 })
+				 .then(response => response.json())
+				 .then(data => {
+			 if (data.success) {
+				   const interviewId = () => {
+					  const interview = todayInterviews.find(item => item.candidateid === candidateId);
+					  return interview ? interview.id : null;
+				   };
+				   if (interviewId) {
+						  const cardElement = document.querySelector(`.interview-card[data-id='${interviewId()}']`);
+						  if (cardElement) {
+							  // cardElement.classList.add('fade-out');
+							  cardElement.addEventListener('transitionend', () => {
+								  // cardElement.remove();
+								  const interview = todayInterviews.find(item => item.candidateid === candidateId);
+								  if (interview) {
+									  interview.status = 'Completed';
+									  interview.candidateStatus = newStatus;
+								  }
+								  showToast(data.message, 'success');
+								  renderInterviews();
+							  });
+						  }
+				   }
+			 } else {
+				 this.showToast(data.message, 'error');
+			 }
+		 })
+		 .catch(err => {
+			 console.error("Error updating status:", err);
+			 showToast("Something went wrong!", "error");
+		 });
+		 }
+
+		const getInitials = (name) => {
+			const parts = name.split(' ');
+			if (parts.length > 1) {
+				return parts[0][0] + parts[1][0];
+			}
+			return parts[0][0];
+		};
+
+		const removeInterviewCard = (cardElement) => {
+			cardElement.classList.add('fade-out');
+			cardElement.addEventListener('transitionend', () => {
+				cardElement.remove();
+				todayInterviews = todayInterviews.filter(item => item.id !== parseInt(cardElement.dataset.id));
+				renderInterviews();
+			});
+		};
+
+		const attachEventListeners = (card) => {
+			const hireBtn = card.querySelector('.option-btn.hire');
+			const rejectBtn = card.querySelector('.option-btn.reject');
+			const reviewBtn = card.querySelector('.option-btn:not(.hire):not(.reject)');
+
+			if (hireBtn) {
+				hireBtn.addEventListener('click', () => {
+					showToast(`Đã chọn 'Hire' cho ứng viên.`, 'success');
+					removeInterviewCard(card);
+				});
+			}
+			if (rejectBtn) {
+				rejectBtn.addEventListener('click', () => {
+					showToast(`Đã chọn 'Reject' cho ứng viên.`, 'error');
+					removeInterviewCard(card);
+				});
+			}
+			if (reviewBtn) {
+				reviewBtn.addEventListener('click', () => {
+					showToast(`Đã chọn 'Review Later' cho ứng viên.`, 'success');
+					removeInterviewCard(card);
+				});
+			}
+		};
+
+		const renderInterviewCard = (interview) => {
+			let actionsHtml = '';
+			if (interview.status === 'Pending') {
+				actionsHtml = `
+					<div class="interview-actions">
+						<button class="option-btn hire" data-action="hire" onclick="updateCandidateStatus(${interview.candidateid}, 'hired')">Hire</button>
+						<button class="option-btn reject" data-action="reject" onclick="updateCandidateStatus(${interview.candidateid}, 'rejected')">Reject</button>
+						<button class="option-btn" data-action="review" onclick="reviewLater(${interview.candidateid})">Review Later</button>
+					</div>
+				`;
+			} else if (interview.status === 'Active') {
+				actionsHtml = `
+					<div class="interview-actions">
+						<button class="join-meet-btn" onclick="window.open('https://meet.google.com/new', '_blank')">
+							<i class="fas fa-video"></i> Join Meet
+						</button>
+					</div>
+				`;
+			}
+
+			const card = document.createElement('div');
+			card.className = "interview-card";
+			card.dataset.id = interview.id;
+			card.innerHTML = `
+				<div class="interview-icon">${getInitials(interview.candidateName)}</div>
+				<div class="interview-content">
+					<div class="interview-info">
+						<h3 class="interview-title">${interview.candidateName}</h3>
+						<div class="interview-role">${interview.role}</div>
+					</div>
+					<div class="interview-meta">
+						<div class="interview-time">${interview.time}</div>
+						<span class="interview-status status-${interview.status}">${interview.status}</span>
+					</div>
+					${actionsHtml}
+				</div>
+			`;
+			return card;
+		};
+
+		const renderInterviews = () => {
+			const startIndex = (currentPage - 1) * itemsPerPage;
+			const endIndex = startIndex + itemsPerPage;
+			const interviewsToRender = todayInterviews.slice(startIndex, endIndex);
+
+			interviewListEl.innerHTML = '';
+			interviewsToRender.forEach(interview => {
+				interviewListEl.appendChild(renderInterviewCard(interview));
+			});
+
+			renderPagination();
+		};
+
+		const renderPagination = () => {
+			const totalPages = Math.ceil(todayInterviews.length / itemsPerPage);
+			paginationEl.innerHTML = '';
+
+			if (totalPages <= 1) return;
+
+			for (let i = 1; i <= totalPages; i++) {
+				const button = document.createElement('button');
+				button.className = `pagination-button ${i === currentPage ? 'active' : ''}`;
+				button.textContent = i;
+				button.addEventListener('click', () => {
+					currentPage = i;
+					renderInterviews();
+				});
+				paginationEl.appendChild(button);
+			}
+		};
+
+		renderInterviews();
+	});
+</script>
+@section Styles {
+	<link rel="stylesheet" href="~/css/ManagerDashBoard.css" />
+}
